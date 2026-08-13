@@ -624,6 +624,12 @@ tr:hover .del-btn { opacity: 1; }
   .month-meta { white-space: normal; }
   .section-head, .section table, .section .tfoot { min-width: 720px; }
   .access-card { padding: 22px; }
+
+  /* Reserva una fila propia para las acciones de pagos programados. De este
+     modo la fecha de cargo nunca coincide con Ver nota ni Eliminar. */
+  #table-programados .td-meta:nth-of-type(5) { grid-row: 3; }
+  #table-programados .td-obs { grid-column: 2; grid-row: 4; }
+  #table-programados .td-del { grid-column: 3; grid-row: 4; }
 }
 </style>
 </head>
