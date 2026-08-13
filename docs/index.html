@@ -5,36 +5,50 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="referrer" content="no-referrer">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src https://api.github.com; font-src 'none'; object-src 'none'; media-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'; manifest-src 'self';">
-<title>Finanzas · Manolo y María</title>
+<title>Finanzas — Manolo y María</title>
 <style>
 :root {
   --display: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
   --body: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --blue: #275dff;
+  --blue-dark: #1544d9;
+  --header-bg: rgba(247, 247, 247, .9);
+  --soft-surface: rgba(255, 255, 255, .26);
+  --soft-surface-hover: rgba(255, 255, 255, .48);
+  --shadow: 0 24px 70px rgba(23, 23, 22, .12);
+  --max: 1240px;
+  --gutter: clamp(1.25rem, 4vw, 4rem);
 }
 
 [data-theme="light"] {
-  --bg:         #ffffff;
-  --bg2:        #f5f5f5;
-  --surface:    #ffffff;
-  --surface2:   #eeeeee;
-  --border:     #e4e4e4;
-  --border2:    #cccccc;
-  --text:       #111111;
+  --bg:         #f7f7f7;
+  --bg2:        #eeeeee;
+  --surface:    rgba(255, 255, 255, .26);
+  --surface2:   rgba(255, 255, 255, .48);
+  --border:     #d4d4d4;
+  --border2:    #aaaaaa;
+  --text:       #171716;
   --text-dim:   #444444;
-  --text-muted: #888888;
+  --text-muted: #666666;
   --green:      #1a6b3a;
-  --red:        #c0392b;
+  --red:        #b33a2d;
 }
 [data-theme="dark"] {
-  --bg:         #111111;
-  --bg2:        #191919;
-  --surface:    #191919;
-  --surface2:   #232323;
-  --border:     #2c2c2c;
-  --border2:    #3a3a3a;
-  --text:       #eeeeee;
-  --text-dim:   #aaaaaa;
-  --text-muted: #666666;
+  --bg:         #171b20;
+  --bg2:        #20262d;
+  --surface:    rgba(255, 255, 255, .06);
+  --surface2:   rgba(255, 255, 255, .11);
+  --border:     #46505a;
+  --border2:    #68737e;
+  --text:       #f3f1eb;
+  --text-dim:   #d5d4d0;
+  --text-muted: #b8bbc0;
+  --blue:       #7c9cff;
+  --blue-dark:  #a9bcff;
+  --header-bg:  rgba(23, 27, 32, .9);
+  --soft-surface: rgba(255, 255, 255, .06);
+  --soft-surface-hover: rgba(255, 255, 255, .11);
+  --shadow: 0 24px 70px rgba(0, 0, 0, .38);
   --green:      #4ade80;
   --red:        #f87171;
 }
@@ -197,11 +211,13 @@ header {
   padding: 0 8px;
 }
 .month-finance {
-  display: block;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   border-bottom: 1px solid var(--border);
   background: var(--surface);
 }
 .month-finance-item { padding: 12px 14px; }
+.month-finance-item + .month-finance-item { border-left: 1px solid var(--border); }
 .month-finance-label {
   display: block;
   margin-bottom: 4px;
@@ -221,6 +237,29 @@ header {
   font: 13px var(--body);
 }
 .month-opening-input:focus { outline: 1px solid var(--text-muted); outline-offset: -1px; }
+.month-finance-note {
+  display: block;
+  min-height: 15px;
+  margin-top: 4px;
+  color: var(--text-muted);
+  font-size: 10px;
+}
+.balance-reconciliation {
+  margin-top: 24px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+.balance-reconciliation summary {
+  padding: 12px 14px;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.balance-reconciliation[open] summary { border-bottom: 1px solid var(--border); }
+.balance-reconciliation .month-finance { border-bottom: none; }
 .monthly-ledger { width: 100%; }
 .month-row {
   display: grid;
@@ -267,6 +306,13 @@ header {
 .month-date-input:focus,
 .month-status-select:focus { outline: 1px solid var(--text-muted); outline-offset: -1px; }
 .month-date-input:disabled { color: var(--text-muted); opacity: .65; }
+.month-period-label {
+  display: flex;
+  align-items: center;
+  min-height: 30px;
+  color: var(--text-muted);
+  font-size: 11px;
+}
 .month-status-select.status-paid { color: var(--green); border-color: var(--green); }
 .month-status-select.status-planned { color: var(--text-muted); }
 .month-amount {
@@ -286,7 +332,7 @@ header {
 
 /* ── CONTENT ───────────────────────────────────────── */
 .content { padding: 28px; max-width: 1080px; }
-.section { margin-bottom: 40px; overflow-x: auto; overscroll-behavior-inline: contain; }
+.section { margin-bottom: 40px; }
 .section-head {
   display: flex; align-items: center; justify-content: space-between;
   padding-bottom: 10px;
@@ -486,6 +532,36 @@ tr.pending-renewal .renewal-toggle { opacity: 1; }
   font: 13px/1.5 var(--body);
 }
 .modal-textarea:focus { outline: 1px solid var(--text-muted); outline-offset: -1px; }
+.modal-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+.modal-field.full { grid-column: 1 / -1; }
+.modal-input,
+.modal-select {
+  display: block;
+  width: 100%;
+  height: 38px;
+  border: 1px solid var(--border2);
+  background: var(--bg);
+  color: var(--text);
+  padding: 0 10px;
+  font: 13px var(--body);
+}
+.modal-input:focus,
+.modal-select:focus { outline: 1px solid var(--text-muted); outline-offset: -1px; }
+.modal-help { margin-top: 6px; color: var(--text-muted); font-size: 11px; line-height: 1.4; }
+.scheduled-actions { display: flex; gap: 6px; justify-content: center; }
+.scheduled-summary { color: var(--text-dim); font-size: 12px; white-space: nowrap; }
+.scheduled-edit {
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 3px;
+}
+.scheduled-edit:hover { color: var(--text); }
 .modal-btn {
   border: 1px solid var(--border2);
   background: var(--surface);
@@ -549,6 +625,180 @@ tr:hover .del-btn { opacity: 1; }
 }
 #toast.show { opacity: 1; transform: translateY(0); }
 
+/* ── PERSONAL SITE DESIGN SYSTEM ───────────────────── */
+body {
+  overflow-x: hidden;
+  font-size: 14px;
+  background: var(--bg);
+}
+button,
+input,
+select,
+textarea { border-radius: 0; }
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[contenteditable="true"]:focus-visible {
+  outline: 3px solid #ffb800;
+  outline-offset: 3px;
+}
+header {
+  height: 80px;
+  padding-inline: max(var(--gutter), calc((100vw - var(--max)) / 2));
+  border-color: var(--border);
+  background: var(--header-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+.h-left { gap: 18px; }
+.h-logo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 23px;
+  line-height: 1;
+  letter-spacing: .09em;
+}
+.h-logo span {
+  padding-left: 16px;
+  border-left: 1px solid var(--border);
+  color: var(--text-muted);
+  font: 700 10px/1 var(--body);
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+.h-sep { display: none; }
+.h-date { font-size: 11px; }
+.hbtn,
+.hbtn-sq {
+  min-height: 40px;
+  border-color: var(--text);
+  color: var(--text);
+  font-weight: 700;
+  transition: transform .2s ease, border-color .2s ease, background .2s ease, color .2s ease;
+}
+.hbtn { padding: 8px 16px; background: var(--text); color: var(--bg); }
+.hbtn-sq { width: 40px; height: 40px; border-radius: 50%; }
+.hbtn:hover,
+.hbtn-sq:hover { transform: translateY(-2px); border-color: var(--blue); background: var(--blue); color: #fff; }
+.hbtn.ok { border-color: var(--green); background: var(--green); color: #fff; }
+
+.kpi-bar {
+  width: min(var(--max), calc(100% - 2 * var(--gutter)));
+  margin: clamp(2rem, 5vw, 4rem) auto 0;
+  border: 1px solid var(--border);
+  background: var(--soft-surface);
+}
+.kpi-item { padding: clamp(18px, 2.5vw, 30px); }
+.kpi-label { margin-bottom: 8px; font-weight: 700; letter-spacing: .14em; }
+.kpi-val {
+  font-family: var(--body);
+  font-size: clamp(25px, 3vw, 38px);
+  font-weight: 700;
+  letter-spacing: -.045em;
+}
+
+.content {
+  width: min(var(--max), calc(100% - 2 * var(--gutter)));
+  max-width: none;
+  margin-inline: auto;
+  padding: clamp(2rem, 5vw, 4rem) 0 clamp(4rem, 8vw, 7rem);
+}
+.month-section,
+table,
+.tfoot,
+.hint-bar { border-color: var(--border); }
+.month-section { margin-bottom: clamp(3rem, 6vw, 5rem); background: var(--soft-surface); }
+.month-toolbar { padding: clamp(18px, 2.5vw, 28px); background: var(--bg2); }
+.month-title {
+  font-family: var(--body);
+  font-size: clamp(22px, 3vw, 34px);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -.04em;
+}
+.month-subtitle { max-width: 680px; margin-top: 8px; font-size: 12px; }
+.month-controls { gap: 8px; }
+.month-nav,
+.month-picker,
+.month-opening-input,
+.month-date-input,
+.month-status-select {
+  min-height: 38px;
+  border-color: var(--border2);
+  background: var(--bg);
+}
+.month-nav { width: 38px; height: 38px; transition: border-color .2s, background .2s, color .2s; }
+.month-nav:hover { border-color: var(--blue); background: var(--blue); color: #fff; }
+.month-picker { height: 38px; padding-inline: 12px; font-weight: 600; }
+.month-finance { background: transparent; }
+.month-finance-item { padding: 18px clamp(18px, 2.5vw, 28px); }
+.month-finance-label { font-weight: 700; letter-spacing: .14em; }
+.month-opening-input { max-width: 260px; height: 40px; padding-inline: 12px; }
+.month-row { min-height: 56px; padding: 10px clamp(14px, 2vw, 24px); }
+.month-row:hover { background: var(--soft-surface-hover); }
+.month-name { font-weight: 600; }
+.month-status-select.status-paid { background: color-mix(in srgb, var(--green) 8%, var(--bg)); }
+.month-amount { font-family: var(--body); font-size: 16px; font-weight: 700; letter-spacing: -.02em; }
+
+.section { margin-bottom: clamp(3.5rem, 7vw, 6rem); overflow-x: auto; scrollbar-color: var(--border2) transparent; }
+.section-head { min-width: 760px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+.section-title {
+  font-family: var(--body);
+  font-size: clamp(22px, 3vw, 34px);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -.04em;
+}
+.add-btn { color: var(--blue-dark); font-weight: 700; letter-spacing: .1em; }
+.add-btn:hover { color: var(--blue); }
+table { min-width: 760px; background: var(--soft-surface); }
+thead th { padding-block: 12px; background: var(--bg2); color: var(--text-muted); font-weight: 700; }
+tbody tr { transition: background .2s; }
+tbody tr:hover { background: var(--soft-surface-hover); }
+td.td-el,
+td.td-imp,
+td.td-meta,
+td.td-obs,
+td.td-renewal,
+td.td-del { padding-block: 11px !important; }
+.editable:hover { border-color: var(--blue); background: var(--surface2); }
+.editable:focus { border-color: var(--blue); background: var(--bg); }
+.notes-btn,
+.renewal-toggle {
+  min-height: 32px;
+  border-color: var(--border2);
+  background: transparent;
+  font-weight: 600;
+}
+.notes-btn:hover,
+.renewal-toggle:hover { border-color: var(--blue); color: var(--blue); }
+.tfoot { min-width: 760px; padding: 13px 16px; background: var(--bg2); }
+.tfoot-label { font-weight: 700; }
+.tfoot-val { font-family: var(--body); font-size: 16px; font-weight: 700; letter-spacing: -.02em; }
+
+.modal-backdrop { background: rgba(0, 0, 0, .72); backdrop-filter: blur(6px); }
+.modal-card { border: 0; background: var(--bg); box-shadow: var(--shadow); }
+.modal-head,
+.modal-actions { padding: 18px 20px; }
+.modal-title { font-family: var(--body); font-size: 24px; font-weight: 700; letter-spacing: -.035em; }
+.modal-close { width: 40px; height: 40px; border: 1px solid var(--text); color: var(--text); }
+.modal-body { padding: 22px 20px; }
+.modal-label { font-weight: 700; letter-spacing: .14em; }
+.modal-input,
+.modal-select,
+.modal-textarea { border-color: var(--border2); background: var(--surface); }
+.modal-input:focus,
+.modal-select:focus,
+.modal-textarea:focus { outline: 1px solid var(--blue); }
+.modal-btn { min-height: 40px; padding-inline: 16px; border-color: var(--text); font-weight: 700; }
+.modal-btn:hover { border-color: var(--blue); color: var(--blue); }
+.modal-btn.primary { border-color: var(--text); background: var(--text); color: var(--bg); }
+.modal-btn.primary:hover { border-color: var(--blue); background: var(--blue); color: #fff; }
+.hint-bar { padding: 18px 20px; background: var(--bg2); }
+#toast { padding: 12px 18px; background: var(--text); color: var(--bg); font-weight: 600; box-shadow: var(--shadow); }
+
 /* ── SECURE ACCESS ─────────────────────────────────── */
 .access-screen {
   min-height: 100vh;
@@ -558,62 +808,81 @@ tr:hover .del-btn { opacity: 1; }
   background: var(--bg2);
 }
 .access-card {
-  width: min(100%, 430px);
+  width: min(100%, 440px);
   padding: 30px;
   border: 1px solid var(--border2);
-  background: var(--surface);
-  box-shadow: 0 24px 80px rgba(0,0,0,.12);
+  background: var(--bg);
+  box-shadow: var(--shadow);
 }
 .access-brand {
   font-family: var(--display);
-  font-size: 26px;
-  letter-spacing: .05em;
-  margin-bottom: 4px;
+  font-size: 28px;
+  letter-spacing: .06em;
 }
 .access-kicker {
+  margin: 3px 0 24px;
   color: var(--text-muted);
-  font-size: 11px;
-  letter-spacing: .1em;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .14em;
   text-transform: uppercase;
-  margin-bottom: 22px;
 }
-.access-title { font-size: 18px; font-weight: 500; margin-bottom: 8px; }
-.access-copy { color: var(--text-muted); font-size: 12px; margin-bottom: 20px; }
-.access-label { display: block; font-size: 11px; color: var(--text-muted); margin: 12px 0 5px; }
+.access-title { margin-bottom: 8px; font-size: 20px; }
+.access-copy { margin-bottom: 20px; color: var(--text-muted); font-size: 12px; }
+.access-label { display: block; margin: 13px 0 5px; color: var(--text-muted); font-size: 11px; }
 .access-input {
   width: 100%; height: 42px; padding: 0 11px;
   border: 1px solid var(--border2); background: var(--surface); color: var(--text);
   font: 14px var(--body);
 }
-.access-input:focus { outline: 2px solid var(--text); outline-offset: 1px; }
 .access-submit {
-  width: 100%; min-height: 42px; margin-top: 18px;
+  width: 100%; min-height: 44px; margin-top: 20px;
   border: 1px solid var(--text); background: var(--text); color: var(--bg);
-  font: 500 12px var(--body); letter-spacing: .08em; text-transform: uppercase;
+  font: 700 11px var(--body); letter-spacing: .1em; text-transform: uppercase;
   cursor: pointer;
 }
 .access-submit:disabled { opacity: .5; cursor: wait; }
 .access-error { min-height: 18px; margin-top: 10px; color: var(--red); font-size: 12px; }
 .access-note { margin-top: 18px; padding-top: 15px; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 11px; }
-.security-actions { display: flex; align-items: center; gap: 6px; }
-.security-menu { display: flex; gap: 6px; flex-wrap: wrap; }
-.file-input { display: none; }
 .password-strength { margin-top: 6px; color: var(--text-muted); font-size: 11px; }
+.file-input { display: none; }
+.security-menu { position: relative; }
+.security-menu > summary {
+  width: 40px; height: 40px;
+  display: grid; place-items: center;
+  border: 1px solid var(--text); border-radius: 50%;
+  cursor: pointer; list-style: none;
+}
+.security-menu > summary::-webkit-details-marker { display: none; }
+.security-menu-panel {
+  position: absolute; top: calc(100% + 8px); right: 0; z-index: 400;
+  width: 178px; padding: 6px;
+  border: 1px solid var(--border2); background: var(--bg); box-shadow: var(--shadow);
+}
+.security-menu-panel button {
+  display: block; width: 100%; padding: 10px;
+  border: 0; background: transparent; color: var(--text);
+  text-align: left; font: 600 11px var(--body); cursor: pointer;
+}
+.security-menu-panel button:hover { background: var(--surface2); }
 
 @media (max-width: 720px) {
-  header { height: auto; min-height: 50px; padding: 9px 14px; flex-wrap: wrap; gap: 8px; }
-  .h-left, .h-right { width: 100%; justify-content: space-between; }
-  .h-right { overflow-x: auto; padding-bottom: 2px; }
-  .security-actions { flex: 0 0 auto; }
-  .security-actions .hbtn-ghost { font-size: 9px; }
+  header { height: 68px; padding-inline: var(--gutter); }
+  .h-logo { font-size: 20px; gap: 10px; }
+  .h-logo span { padding-left: 10px; font-size: 9px; }
   .h-date { display: none; }
+  .hbtn { width: 40px; padding: 0; justify-content: center; font-size: 0; }
+  .hbtn svg { width: 15px; height: 15px; }
+  .kpi-bar { margin-top: 24px; }
   .kpi-bar { grid-template-columns: repeat(2, 1fr); }
-  .kpi-item { padding: 13px 14px; }
+  .kpi-item { padding: 16px; }
   .kpi-item:nth-child(2) { border-right: none; }
   .kpi-item:nth-child(-n+2) { border-bottom: 1px solid var(--border); }
   .kpi-val { font-size: 24px; }
-  .content { padding: 18px 12px; }
+  .content { padding-block: 28px 56px; }
   .month-toolbar { align-items: flex-start; flex-direction: column; }
+  .month-finance { grid-template-columns: 1fr; }
+  .month-finance-item + .month-finance-item { border-left: none; border-top: 1px solid var(--border); }
   .month-controls { width: 100%; }
   .month-picker { flex: 1; min-width: 0; }
   .month-row { grid-template-columns: minmax(0, 1fr) 100px; gap: 8px 10px; padding: 10px; }
@@ -622,14 +891,129 @@ tr:hover .del-btn { opacity: 1; }
   .month-status-select { grid-column: 2; grid-row: 2; }
   .month-amount { grid-column: 2; grid-row: 1; }
   .month-meta { white-space: normal; }
-  .section-head, .section table, .section .tfoot { min-width: 720px; }
-  .access-card { padding: 22px; }
+  .modal-form-grid { grid-template-columns: 1fr; }
+  .modal-field.full { grid-column: auto; }
 
-  /* Reserva una fila propia para las acciones de pagos programados. De este
-     modo la fecha de cargo nunca coincide con Ver nota ni Eliminar. */
-  #table-programados .td-meta:nth-of-type(5) { grid-row: 3; }
-  #table-programados .td-obs { grid-column: 2; grid-row: 4; }
+  /* Las fichas evitan el desplazamiento lateral y preservan todas las acciones
+     en los listados que se editan habitualmente desde el teléfono. */
+  .section { overflow: visible; padding-bottom: 0; }
+  .section-head,
+  .tfoot { min-width: 0; }
+  .section-head { gap: 12px; }
+  .add-btn { flex: 0 0 auto; min-height: 40px; }
+
+  #table-programados,
+  #table-ingresos,
+  #table-gastos,
+  #table-sinSuscripcion,
+  #table-anuales { min-width: 0; border: none; background: transparent; }
+  #table-programados thead,
+  #table-ingresos thead,
+  #table-gastos thead,
+  #table-sinSuscripcion thead,
+  #table-anuales thead { display: none; }
+  #table-programados tbody,
+  #table-ingresos tbody,
+  #table-gastos tbody,
+  #table-sinSuscripcion tbody,
+  #table-anuales tbody { display: grid; gap: 12px; }
+  #table-programados tr,
+  #table-ingresos tr,
+  #table-gastos tr,
+  #table-sinSuscripcion tr,
+  #table-anuales tr {
+    display: grid;
+    grid-template-columns: 36px minmax(0, 1fr) auto;
+    gap: 6px 10px;
+    align-items: center;
+    border: 1px solid var(--border);
+    background: var(--soft-surface);
+  }
+  #table-ingresos .td-handle,
+  #table-gastos .td-handle,
+  #table-sinSuscripcion .td-handle,
+  #table-anuales .td-handle { display: none; }
+  #table-programados .td-color,
+  #table-ingresos .td-color,
+  #table-gastos .td-color,
+  #table-sinSuscripcion .td-color,
+  #table-anuales .td-color { grid-column: 1; grid-row: 1; padding: 10px !important; }
+  #table-programados .td-el,
+  #table-ingresos .td-el,
+  #table-gastos .td-el,
+  #table-sinSuscripcion .td-el,
+  #table-anuales .td-el { grid-column: 2; grid-row: 1; min-width: 0; }
+  #table-programados .td-imp,
+  #table-ingresos .td-imp,
+  #table-gastos .td-imp,
+  #table-sinSuscripcion .td-imp,
+  #table-anuales .td-imp { grid-column: 3; grid-row: 1; padding-right: 12px !important; }
+  #table-programados .td-meta,
+  #table-ingresos .td-meta,
+  #table-gastos .td-meta,
+  #table-sinSuscripcion .td-meta,
+  #table-anuales .td-meta {
+    grid-column: 2 / -1;
+    padding: 0 12px !important;
+    white-space: normal;
+  }
+  #table-programados .td-meta:nth-of-type(4),
+  #table-ingresos .td-meta { grid-row: 2; }
+  #table-programados .td-meta:nth-of-type(5),
+  #table-gastos .td-meta:nth-of-type(6),
+  #table-sinSuscripcion .td-meta:nth-of-type(6),
+  #table-anuales .td-meta:nth-of-type(6) { grid-row: 3; }
+  #table-gastos .td-meta:nth-of-type(5),
+  #table-sinSuscripcion .td-meta:nth-of-type(5),
+  #table-anuales .td-meta:nth-of-type(5) { grid-row: 2; }
+  #table-gastos .td-renewal,
+  #table-sinSuscripcion .td-renewal,
+  #table-anuales .td-renewal { grid-column: 2 / -1; grid-row: 4; padding: 4px 12px !important; }
+  #table-programados .td-obs { grid-column: 2; grid-row: 4; padding: 8px 12px !important; }
+  #table-ingresos .td-obs { grid-column: 2; grid-row: 3; padding: 8px 12px !important; }
+  #table-gastos .td-obs,
+  #table-sinSuscripcion .td-obs,
+  #table-anuales .td-obs { grid-column: 2; grid-row: 5; padding: 8px 12px !important; }
   #table-programados .td-del { grid-column: 3; grid-row: 4; }
+  #table-ingresos .td-del { grid-column: 3; grid-row: 3; }
+  #table-gastos .td-del,
+  #table-sinSuscripcion .td-del,
+  #table-anuales .td-del { grid-column: 3; grid-row: 5; }
+  #table-programados .td-del,
+  #table-ingresos .td-del,
+  #table-gastos .td-del,
+  #table-sinSuscripcion .td-del,
+  #table-anuales .td-del { width: auto; padding: 8px 10px !important; }
+  #table-programados .del-btn,
+  #table-ingresos .del-btn,
+  #table-gastos .del-btn,
+  #table-sinSuscripcion .del-btn,
+  #table-anuales .del-btn { min-width: 40px; min-height: 40px; opacity: 1; }
+  #table-programados .month-empty { grid-column: 1 / -1; text-align: left; }
+  #table-programados .td-meta::before,
+  #table-ingresos .td-meta::before,
+  #table-gastos .td-meta::before,
+  #table-sinSuscripcion .td-meta::before,
+  #table-anuales .td-meta::before {
+    display: block;
+    margin-bottom: 2px;
+    color: var(--text-muted);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+  }
+  #table-programados .td-meta:nth-of-type(4)::before,
+  #table-ingresos .td-meta::before,
+  #table-gastos .td-meta:nth-of-type(5)::before,
+  #table-sinSuscripcion .td-meta:nth-of-type(5)::before,
+  #table-anuales .td-meta:nth-of-type(5)::before { content: 'Frecuencia'; }
+  #table-programados .td-meta:nth-of-type(5)::before { content: 'Cargo'; }
+  #table-gastos .td-meta:nth-of-type(6)::before,
+  #table-sinSuscripcion .td-meta:nth-of-type(6)::before { content: 'Día de cargo'; }
+  #table-anuales .td-meta:nth-of-type(6)::before { content: 'Fecha de cargo'; }
+  #toast { right: var(--gutter); left: var(--gutter); bottom: 16px; text-align: center; }
+  .access-card { padding: 22px; }
 }
 </style>
 </head>
@@ -663,23 +1047,26 @@ tr:hover .del-btn { opacity: 1; }
 <div id="app">
   <header>
     <div class="h-left">
-      <div class="h-logo">M&M <span>· Finanzas</span></div>
+      <div class="h-logo">Manolo y María <span>Finanzas</span></div>
       <div class="h-sep"></div>
       <div class="h-date" id="h-date"></div>
     </div>
     <div class="h-right">
-      <div class="security-actions">
-        <button class="hbtn-ghost" type="button" onclick="openPasswordModal()">Contraseña</button>
-        <button class="hbtn-ghost" type="button" onclick="exportVault()">Backup</button>
-        <button class="hbtn-ghost" type="button" onclick="document.getElementById('backup-input').click()">Restaurar</button>
-        <button class="hbtn-ghost" type="button" onclick="lockApp()">Salir</button>
-        <input class="file-input" id="backup-input" type="file" accept="application/json,.json" onchange="importVault(event)">
-      </div>
+      <details class="security-menu" id="security-menu">
+        <summary aria-label="Seguridad y copias" title="Seguridad y copias">⋯</summary>
+        <div class="security-menu-panel">
+          <button type="button" onclick="openPasswordModal()">Cambiar contraseña</button>
+          <button type="button" onclick="exportVault()">Descargar backup</button>
+          <button type="button" onclick="document.getElementById('backup-input').click()">Restaurar backup</button>
+          <button type="button" onclick="lockApp()">Cerrar sesión</button>
+          <input class="file-input" id="backup-input" type="file" accept="application/json,.json" onchange="importVault(event)">
+        </div>
+      </details>
       <button class="hbtn-sq" onclick="toggleTheme()" title="Cambiar tema">
         <svg id="icon-sun" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
         <svg id="icon-moon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
       </button>
-      <button class="hbtn" id="save-btn" onclick="saveData()">
+      <button class="hbtn" id="save-btn" onclick="saveData()" aria-label="Guardar cambios">
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
         Guardar
       </button>
@@ -690,7 +1077,7 @@ tr:hover .del-btn { opacity: 1; }
     <div class="kpi-item"><div class="kpi-label">Ingresos del mes</div><div class="kpi-val income" id="kpi-ingresos">—</div></div>
     <div class="kpi-item"><div class="kpi-label">Gastos del mes</div><div class="kpi-val expense" id="kpi-gastos">—</div></div>
     <div class="kpi-item"><div class="kpi-label">Balance del mes</div><div class="kpi-val" id="kpi-sit">—</div></div>
-    <div class="kpi-item"><div class="kpi-label">Saldo final estimado</div><div class="kpi-val" id="kpi-closing-balance">—</div></div>
+    <div class="kpi-item"><div class="kpi-label" id="kpi-closing-label">Saldo final estimado</div><div class="kpi-val" id="kpi-closing-balance">—</div></div>
   </div>
 
   <div class="content">
@@ -707,18 +1094,34 @@ tr:hover .del-btn { opacity: 1; }
           <button class="month-nav" id="month-next" type="button" onclick="shiftSelectedMonth(1)" aria-label="Mes siguiente">›</button>
         </div>
       </div>
-      <div class="month-finance">
-        <div class="month-finance-item">
-          <label class="month-finance-label" for="month-opening-balance">Saldo al comenzar el mes</label>
-          <input class="month-opening-input" id="month-opening-balance" type="text" inputmode="decimal" placeholder="Introduce el saldo" oninput="updateOpeningBalance(this.value)" onblur="finalizeOpeningBalance()">
-        </div>
-      </div>
       <div class="monthly-ledger" id="monthly-ledger"></div>
     </div>
 
     <div class="section">
       <div class="section-head">
-        <div class="section-title">Ingresos mensuales</div>
+        <div class="section-title">Pagos puntuales y a plazos</div>
+        <button class="add-btn" type="button" onclick="openScheduledPaymentModal()">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Añadir
+        </button>
+      </div>
+      <table id="table-programados">
+        <thead><tr>
+          <th class="th-color">Color</th>
+          <th>Concepto</th>
+          <th class="th-r">Importe por cargo</th>
+          <th>Programación</th>
+          <th>Cargo del mes</th>
+          <th>Notas</th>
+          <th class="th-xs"></th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+      <div class="tfoot"><span class="tfoot-label">Total programado del mes</span><span class="tfoot-val" id="total-programados">—</span></div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <div class="section-title">Ingresos del mes</div>
         <button class="add-btn" onclick="addRow('ingresos')">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Añadir
         </button>
@@ -783,7 +1186,7 @@ tr:hover .del-btn { opacity: 1; }
         </tr></thead>
         <tbody></tbody>
       </table>
-      <div class="tfoot"><span class="tfoot-label">Coste medio mensual</span><span class="tfoot-val" id="total-no-mensuales">—</span></div>
+      <div class="tfoot"><span class="tfoot-label">Total del mes</span><span class="tfoot-val" id="total-no-mensuales">—</span></div>
     </div>
 
     <div class="section">
@@ -807,11 +1210,27 @@ tr:hover .del-btn { opacity: 1; }
         </tr></thead>
         <tbody></tbody>
       </table>
-      <div class="tfoot"><span class="tfoot-label">Total anual</span><span class="tfoot-val" id="total-anuales">—</span></div>
+      <div class="tfoot"><span class="tfoot-label">Total del mes</span><span class="tfoot-val" id="total-anuales">—</span></div>
     </div>
 
+    <details class="balance-reconciliation">
+      <summary>Conciliación de saldos</summary>
+      <div class="month-finance">
+        <div class="month-finance-item">
+          <label class="month-finance-label" for="month-opening-balance">Saldo al comenzar el mes</label>
+          <input class="month-opening-input" id="month-opening-balance" type="text" inputmode="decimal" placeholder="Introduce el saldo" oninput="updateOpeningBalance(this.value)" onblur="finalizeOpeningBalance()">
+          <span class="month-finance-note" id="month-opening-source"></span>
+        </div>
+        <div class="month-finance-item">
+          <label class="month-finance-label" for="month-confirmed-closing">Saldo final confirmado</label>
+          <input class="month-opening-input" id="month-confirmed-closing" type="text" inputmode="decimal" placeholder="Confirma el cierre bancario" oninput="updateConfirmedClosing(this.value)" onblur="finalizeConfirmedClosing()">
+          <span class="month-finance-note" id="month-closing-reconciliation">Se enlaza automáticamente con el mes siguiente.</span>
+        </div>
+      </div>
+    </details>
+
     <div class="hint-bar">
-      <span class="hint-text">Al pulsar Guardar, los datos se cifran en este navegador. Usa Backup para conservar una copia o trasladarlos a otro dispositivo.</span>
+      <span class="hint-text">Al pulsar Guardar, la copia cifrada se actualiza en GitHub para todos los dispositivos.</span>
     </div>
 
   </div>
@@ -856,6 +1275,57 @@ tr:hover .del-btn { opacity: 1; }
   </div>
 </div>
 
+<div class="modal-backdrop" id="scheduled-payment-modal" hidden onclick="handleScheduledPaymentBackdrop(event)">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="scheduled-payment-modal-title">
+    <div class="modal-head">
+      <div class="modal-title" id="scheduled-payment-modal-title">Añadir pago programado</div>
+      <button class="modal-close" type="button" onclick="closeScheduledPaymentModal()" aria-label="Cerrar">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-form-grid">
+        <div class="modal-field full">
+          <label class="modal-label" for="scheduled-name">Concepto</label>
+          <input class="modal-input" id="scheduled-name" type="text" placeholder="Ej. Compra en Klarna" maxlength="120">
+        </div>
+        <div class="modal-field">
+          <label class="modal-label" for="scheduled-type">Tipo</label>
+          <select class="modal-select" id="scheduled-type" onchange="updateScheduledPaymentForm()">
+            <option value="unico">Gasto único</option>
+            <option value="mes">Gasto del mes, sin fecha</option>
+            <option value="cuotas">Pago en cuotas</option>
+          </select>
+        </div>
+        <div class="modal-field">
+          <label class="modal-label" for="scheduled-amount">Importe por cargo</label>
+          <input class="modal-input" id="scheduled-amount" type="text" inputmode="decimal" placeholder="0,00 €">
+        </div>
+        <div class="modal-field">
+          <label class="modal-label" id="scheduled-date-label" for="scheduled-date">Fecha del primer cargo</label>
+          <input class="modal-input" id="scheduled-date" type="date">
+        </div>
+        <div class="modal-field" id="scheduled-installments-field" hidden>
+          <label class="modal-label" for="scheduled-installments">Número de cuotas</label>
+          <input class="modal-input" id="scheduled-installments" type="number" min="2" max="36" step="1" value="3">
+          <div class="modal-help">Se crea un cargo al mes, el mismo día, desde la primera fecha.</div>
+        </div>
+        <div class="modal-field" id="scheduled-final-amount-field" hidden>
+          <label class="modal-label" for="scheduled-final-amount">Importe de la última cuota</label>
+          <input class="modal-input" id="scheduled-final-amount" type="text" inputmode="decimal" placeholder="Igual que las demás">
+          <div class="modal-help">Opcional: úsalo para corregir el redondeo o una última cuota diferente.</div>
+        </div>
+        <div class="modal-field full">
+          <label class="modal-label" for="scheduled-notes">Notas</label>
+          <textarea class="modal-textarea" id="scheduled-notes" style="min-height:90px" placeholder="Opcional"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn" type="button" onclick="closeScheduledPaymentModal()">Cancelar</button>
+      <button class="modal-btn primary" type="button" onclick="applyScheduledPayment()">Aplicar</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
@@ -864,7 +1334,6 @@ const GITHUB_REPO = 'francesrevert';
 const GITHUB_BRANCH = 'main';
 const VAULT_PATH = 'vault.json';
 const GITHUB_API_VERSION = '2022-11-28';
-const THEME_STORAGE_KEY = 'mm_finance_theme';
 const PBKDF2_ITERATIONS = 600000;
 const LOCK_AFTER_MS = 15 * 60 * 1000;
 let data = null;
@@ -879,18 +1348,24 @@ const MIN_SELECTED_MONTH = new Date(new Date().getFullYear() - 1, 0, 1);
 let selectedMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
 if (selectedMonth < MIN_SELECTED_MONTH) selectedMonth = new Date(MIN_SELECTED_MONTH);
 let observationEditor = null;
+let scheduledPaymentEditorId = null;
 
 // ── THEME ──────────────────────────────────────────────
+const THEME_PREFERENCE_KEY = 'manolo-maria-theme';
 function applyTheme(t) {
   document.documentElement.setAttribute('data-theme', t);
-  localStorage.setItem(THEME_STORAGE_KEY, t);
+  try { localStorage.setItem(THEME_PREFERENCE_KEY, t); } catch { /* El almacenamiento puede estar bloqueado. */ }
   document.getElementById('icon-sun').style.display  = t === 'dark'  ? 'block' : 'none';
   document.getElementById('icon-moon').style.display = t === 'light' ? 'block' : 'none';
 }
 function toggleTheme() {
   applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
 }
-applyTheme(localStorage.getItem(THEME_STORAGE_KEY) || 'light');
+let savedTheme = null;
+try { savedTheme = localStorage.getItem(THEME_PREFERENCE_KEY); } catch { /* El almacenamiento puede estar bloqueado. */ }
+applyTheme(savedTheme === 'light' || savedTheme === 'dark'
+  ? savedTheme
+  : (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
 
 // ── SECURE VAULT ───────────────────────────────────────
 const encoder = new TextEncoder();
@@ -936,8 +1411,7 @@ function vaultApiUrl() {
 }
 async function fetchRemoteVault(token) {
   const response = await fetch(`${vaultApiUrl()}?ref=${encodeURIComponent(GITHUB_BRANCH)}`, {
-    headers: githubHeaders(token),
-    cache: 'no-store'
+    headers: githubHeaders(token), cache: 'no-store'
   });
   if (response.status === 401 || response.status === 403) {
     throw new Error('GitHub ha rechazado el token. Comprueba que siga vigente y tenga permiso Contents: read and write.');
@@ -955,12 +1429,8 @@ async function putRemoteVault(vault, message) {
     headers: { ...githubHeaders(githubToken), 'Content-Type': 'application/json' },
     body: JSON.stringify({ message, content, sha: remoteVaultSha, branch: GITHUB_BRANCH })
   });
-  if (response.status === 409) {
-    throw new Error('Otra persona ha guardado cambios antes. Sal y vuelve a entrar para cargar la última versión.');
-  }
-  if (response.status === 401 || response.status === 403) {
-    throw new Error('GitHub ha rechazado el guardado. Revisa el token y su permiso Contents: read and write.');
-  }
+  if (response.status === 409) throw new Error('Otra persona ha guardado cambios antes. Sal y vuelve a entrar para cargar la última versión.');
+  if (response.status === 401 || response.status === 403) throw new Error('GitHub ha rechazado el guardado. Revisa el token y su permiso Contents: read and write.');
   if (!response.ok) throw new Error(`GitHub no ha podido guardar los datos (${response.status}).`);
   const result = await response.json();
   remoteVaultSha = result.content.sha;
@@ -985,31 +1455,32 @@ async function createVault(password, payload, forcePasswordChange = false) {
   const salt = crypto.getRandomValues(new Uint8Array(16));
   const key = await deriveVaultKey(password, salt);
   const encrypted = await encryptData(key, payload);
-  const vault = {
-    version: 1,
-    cipher: 'AES-GCM',
-    kdf: { name: 'PBKDF2-SHA256', iterations: PBKDF2_ITERATIONS, salt: bytesToBase64(salt) },
-    iv: encrypted.iv,
-    ciphertext: encrypted.ciphertext,
-    forcePasswordChange,
-    updatedAt: new Date().toISOString()
+  return {
+    key,
+    vault: {
+      version: 1,
+      cipher: 'AES-GCM',
+      kdf: { name: 'PBKDF2-SHA256', iterations: PBKDF2_ITERATIONS, salt: bytesToBase64(salt) },
+      ...encrypted,
+      forcePasswordChange,
+      updatedAt: new Date().toISOString()
+    }
   };
-  return { vault, key };
 }
 async function persistEncryptedData() {
   if (!githubToken || !vaultKey || !currentVault || !data) throw new Error('La sesión está bloqueada.');
   const encrypted = await encryptData(vaultKey, data);
-  const vault = { ...currentVault, ...encrypted, forcePasswordChange: false, updatedAt: new Date().toISOString() };
-  await putRemoteVault(vault, `finanzas: actualizar datos ${new Date().toLocaleString('es-ES')}`);
+  await putRemoteVault(
+    { ...currentVault, ...encrypted, forcePasswordChange: false, updatedAt: new Date().toISOString() },
+    `finanzas: actualizar datos ${new Date().toLocaleString('es-ES')}`
+  );
 }
 function setAccessBusy(busy) {
   const button = document.getElementById('access-submit');
   button.disabled = busy;
   button.textContent = busy ? 'Verificando…' : (accessMode === 'bootstrap-change' ? 'Crear contraseña' : 'Desbloquear');
 }
-function setAccessError(message = '') {
-  document.getElementById('access-error').textContent = message;
-}
+function setAccessError(message = '') { document.getElementById('access-error').textContent = message; }
 function showBootstrapChange() {
   accessMode = 'bootstrap-change';
   document.getElementById('access-title').textContent = 'Crea una contraseña nueva';
@@ -1045,31 +1516,23 @@ async function handleAccess(event) {
       openApp();
       return;
     }
-
     const tokenInput = document.getElementById('github-token');
     const passwordInput = document.getElementById('access-password');
     const token = tokenInput.value.trim();
-    const password = passwordInput.value;
     if (!token) throw new Error('Introduce el token de GitHub.');
     const remote = await fetchRemoteVault(token);
-    const vault = remote.vault;
-    const unlocked = await decryptVault(vault, password);
-    passwordInput.value = '';
+    const unlocked = await decryptVault(remote.vault, passwordInput.value);
     tokenInput.value = '';
+    passwordInput.value = '';
     githubToken = token;
     remoteVaultSha = remote.sha;
-    currentVault = vault;
+    currentVault = remote.vault;
     vaultKey = unlocked.key;
     data = unlocked.payload;
-    if (vault.forcePasswordChange) {
-      showBootstrapChange();
-      return;
-    }
+    if (currentVault.forcePasswordChange) { showBootstrapChange(); return; }
     openApp();
   } catch (error) {
-    setAccessError(error.message.includes('decrypt') || error.name === 'OperationError'
-      ? 'La contraseña no es correcta o la copia está dañada.'
-      : error.message);
+    setAccessError(error.name === 'OperationError' ? 'La contraseña no es correcta o la copia está dañada.' : error.message);
   } finally {
     setAccessBusy(false);
   }
@@ -1107,16 +1570,21 @@ initAccess();
 // ── RENDER ─────────────────────────────────────────────
 function renderAll() {
   ['ingresos','gastos','sinSuscripcion','anuales'].forEach(renderSection);
+  renderScheduledPayments();
   updateKPIs();
 }
 
 function renderSection(s) {
   const tbody = document.querySelector(`#table-${s} tbody`);
   tbody.innerHTML = '';
+  const visibleRows = (data[s] || [])
+    .map((row, sourceIndex) => ({ row, sourceIndex }))
+    .filter(({ row }) => sectionRowVisibleForPeriod(s, row, selectedPeriod()));
 
-  (data[s] || []).forEach((row, idx) => {
+  visibleRows.forEach(({ row, sourceIndex }) => {
     ensurePlanFields(row, s);
     const tr = document.createElement('tr');
+    tr.dataset.sourceIndex = String(sourceIndex);
     if (s !== 'ingresos' && row.pendienteRenovacion) tr.classList.add('pending-renewal');
 
     // Aplica color de fondo a la fila con opacidad baja
@@ -1168,7 +1636,7 @@ function renderSection(s) {
     // importe
     const tdImp = mk('td', 'td-imp');
     const impSp = mk('span', 'editable');
-    const monthlyVariable = s === 'ingresos' && row.edicionMensual;
+    const monthlyVariable = s === 'ingresos' && isMonthlyVariableIncome(row);
     const displayedAmount = tableAmount(row, s);
     if (monthlyVariable) tdImp.title = `Importe de ${fullMonthNames[selectedPeriod().month - 1]} de ${selectedPeriod().year}`;
     impSp.contentEditable = true;
@@ -1251,10 +1719,10 @@ function renderSection(s) {
     tdDel.appendChild(delBtn); tr.appendChild(tdDel);
 
     // drag & drop
-    tr.setAttribute('draggable', true);
+    tr.setAttribute('draggable', String(!window.matchMedia('(max-width: 720px)').matches));
     tr.addEventListener('dragstart', e => {
       e.dataTransfer.effectAllowed = 'move';
-      e.dataTransfer.setData('text/plain', String(idx));
+      e.dataTransfer.setData('text/plain', String(sourceIndex));
       setTimeout(() => tr.classList.add('dragging'), 0);
     });
     tr.addEventListener('dragend', () => {
@@ -1291,6 +1759,211 @@ function renderSection(s) {
   updateTotals(s);
 }
 
+function renderScheduledPayments() {
+  const tbody = document.querySelector('#table-programados tbody');
+  tbody.innerHTML = '';
+  const period = selectedPeriod();
+  const scheduledForPeriod = (data.programados || []).filter(row => scheduledInstallmentIndex(row, period) != null);
+
+  scheduledForPeriod.forEach(row => {
+    const installmentIndex = scheduledInstallmentIndex(row, period) ?? 0;
+    const scheduledDate = scheduledPaymentDate(row, installmentIndex);
+    const recorded = (row.historialFacturas || []).find(item => historyMatchesPeriod(item, period));
+    const tr = document.createElement('tr');
+    if (row.color) tr.style.background = hexToRgba(row.color, 0.08);
+
+    const tdColor = mk('td', 'td-color');
+    const dotWrap = mk('div', 'color-dot-wrap');
+    const dot = mk('div', 'color-dot');
+    dot.style.background = row.color || 'transparent';
+    if (!row.color) dot.style.borderStyle = 'dashed';
+    const picker = document.createElement('input');
+    picker.type = 'color';
+    picker.className = 'color-picker-input';
+    picker.value = row.color || '#cccccc';
+    dot.addEventListener('click', () => picker.click());
+    picker.addEventListener('input', () => {
+      row.color = picker.value;
+      dot.style.background = picker.value;
+      dot.style.borderStyle = 'solid';
+      tr.style.background = hexToRgba(picker.value, 0.08);
+      updateKPIs();
+    });
+    dotWrap.append(dot, picker);
+    tdColor.appendChild(dotWrap);
+    tr.appendChild(tdColor);
+
+    const tdName = mk('td', 'td-el');
+    tdName.textContent = row.elemento || 'Sin nombre';
+    tr.appendChild(tdName);
+
+    const tdAmount = mk('td', 'td-imp');
+    tdAmount.textContent = eur(recorded ? Number(recorded.importe) || 0 : scheduledPaymentAmount(row, installmentIndex));
+    tr.appendChild(tdAmount);
+
+    const tdSchedule = mk('td', 'td-meta');
+    const summary = mk('span', 'scheduled-summary');
+    summary.textContent = row.tipoProgramacion === 'cuotas'
+      ? `Cuota ${installmentIndex + 1} de ${row.numeroCuotas}`
+      : row.tipoProgramacion === 'mes' ? 'Gasto del mes' : 'Un solo cargo';
+    tdSchedule.appendChild(summary);
+    tr.appendChild(tdSchedule);
+
+    const tdDate = mk('td', 'td-meta');
+    tdDate.textContent = row.tipoProgramacion === 'mes'
+      ? `Durante ${fullMonthNames[period.month - 1]} de ${period.year}`
+      : formatShortDate(recorded?.fecha || isoLocalDate(scheduledDate));
+    tr.appendChild(tdDate);
+
+    const tdNotes = mk('td', 'td-obs');
+    const notesBtn = mk('button', `notes-btn${row.observaciones ? ' has-notes' : ''}`);
+    notesBtn.type = 'button';
+    notesBtn.textContent = row.observaciones ? 'Ver nota' : 'Añadir';
+    notesBtn.addEventListener('click', () => openScheduledPaymentModal(String(row.id)));
+    tdNotes.appendChild(notesBtn);
+    tr.appendChild(tdNotes);
+
+    const tdActions = mk('td', 'td-del');
+    const actions = mk('div', 'scheduled-actions');
+    const editBtn = mk('button', 'scheduled-edit');
+    editBtn.type = 'button';
+    editBtn.title = 'Editar';
+    editBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/></svg>';
+    editBtn.addEventListener('click', () => openScheduledPaymentModal(String(row.id)));
+    const delBtn = mk('button', 'del-btn');
+    delBtn.type = 'button';
+    delBtn.title = 'Eliminar';
+    delBtn.style.opacity = '1';
+    delBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6M9 6V4h6v2"/></svg>';
+    delBtn.addEventListener('click', () => {
+      data.programados = data.programados.filter(item => String(item.id) !== String(row.id));
+      renderScheduledPayments();
+      updateKPIs();
+      showToast('Pago programado eliminado; pulsa Guardar');
+    });
+    actions.append(editBtn, delBtn);
+    tdActions.appendChild(actions);
+    tr.appendChild(tdActions);
+    tbody.appendChild(tr);
+  });
+
+  if (!scheduledForPeriod.length) {
+    const tr = document.createElement('tr');
+    const td = document.createElement('td');
+    td.colSpan = 7;
+    td.className = 'month-empty';
+    td.textContent = `No hay pagos puntuales ni cuotas en ${fullMonthNames[period.month - 1]} de ${period.year}.`;
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+  }
+  updateScheduledPaymentsTotal();
+}
+
+function updateScheduledPaymentsTotal() {
+  const period = selectedPeriod();
+  const total = (data.programados || []).reduce((sum, row) => {
+    const installmentIndex = scheduledInstallmentIndex(row, period);
+    if (installmentIndex == null) return sum;
+    const recorded = (row.historialFacturas || []).find(item => historyMatchesPeriod(item, period));
+    return sum + (recorded ? Number(recorded.importe) || 0 : scheduledPaymentAmount(row, installmentIndex));
+  }, 0);
+  document.getElementById('total-programados').textContent = eur(total);
+}
+
+function openScheduledPaymentModal(rowId = null) {
+  const row = rowId ? findMovementRow('programados', rowId) : null;
+  scheduledPaymentEditorId = row ? String(row.id) : null;
+  document.getElementById('scheduled-payment-modal-title').textContent = row ? 'Editar pago programado' : 'Añadir pago programado';
+  document.getElementById('scheduled-name').value = row?.elemento || '';
+  document.getElementById('scheduled-type').value = ['cuotas', 'mes'].includes(row?.tipoProgramacion) ? row.tipoProgramacion : 'unico';
+  document.getElementById('scheduled-amount').value = row ? formatEditableAmount(Number(row.importe) || 0) : '';
+  document.getElementById('scheduled-installments').value = row?.numeroCuotas || 3;
+  document.getElementById('scheduled-final-amount').value = Number.isFinite(Number(row?.importeCuotaFinal)) ? formatEditableAmount(Number(row.importeCuotaFinal)) : '';
+  document.getElementById('scheduled-notes').value = row?.observaciones || '';
+  updateScheduledPaymentForm();
+  document.getElementById('scheduled-date').value = row?.tipoProgramacion === 'mes'
+    ? row.mesCargo || selectedPeriod().key
+    : row?.fechaInicio || dateForPeriodDay(selectedPeriod(), new Date().getDate());
+  document.getElementById('scheduled-payment-modal').hidden = false;
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => document.getElementById('scheduled-name').focus(), 0);
+}
+function closeScheduledPaymentModal() {
+  document.getElementById('scheduled-payment-modal').hidden = true;
+  document.body.style.overflow = '';
+  scheduledPaymentEditorId = null;
+}
+function handleScheduledPaymentBackdrop(event) {
+  if (event.target.id === 'scheduled-payment-modal') closeScheduledPaymentModal();
+}
+function updateScheduledPaymentForm() {
+  const type = document.getElementById('scheduled-type').value;
+  const isInstallmentPlan = type === 'cuotas';
+  const isMonthOnly = type === 'mes';
+  const dateInput = document.getElementById('scheduled-date');
+  const previousValue = dateInput.value;
+  dateInput.type = isMonthOnly ? 'month' : 'date';
+  document.getElementById('scheduled-date-label').textContent = isMonthOnly ? 'Mes del gasto' : 'Fecha del primer cargo';
+  if (isMonthOnly && /^\d{4}-\d{2}-\d{2}$/.test(previousValue)) dateInput.value = previousValue.slice(0, 7);
+  if (!isMonthOnly && /^\d{4}-\d{2}$/.test(previousValue)) dateInput.value = `${previousValue}-01`;
+  document.getElementById('scheduled-installments-field').hidden = !isInstallmentPlan;
+  document.getElementById('scheduled-final-amount-field').hidden = !isInstallmentPlan;
+}
+function applyScheduledPayment() {
+  const name = document.getElementById('scheduled-name').value.trim();
+  const amount = parseLocalizedAmount(document.getElementById('scheduled-amount').value);
+  const startDate = document.getElementById('scheduled-date').value;
+  const selectedType = document.getElementById('scheduled-type').value;
+  const type = ['cuotas', 'mes'].includes(selectedType) ? selectedType : 'unico';
+  const installments = type === 'cuotas' ? Number.parseInt(document.getElementById('scheduled-installments').value, 10) : 1;
+  const finalAmountInput = parseLocalizedAmount(document.getElementById('scheduled-final-amount').value);
+  const validPeriod = type === 'mes' ? isMonthKey(startDate) : Boolean(parseIsoDate(startDate));
+  if (!name || amount == null || amount <= 0 || !validPeriod || !Number.isInteger(installments) || installments < (type === 'cuotas' ? 2 : 1) || installments > 36 || (finalAmountInput != null && finalAmountInput <= 0)) {
+    showToast('Completa concepto, importe, periodo y número de cuotas válidos');
+    return;
+  }
+
+  const existing = scheduledPaymentEditorId ? findMovementRow('programados', scheduledPaymentEditorId) : null;
+  const row = existing || {
+    id: `p${Date.now()}`,
+    color: null,
+    historialFacturas: []
+  };
+  row.elemento = name;
+  row.importe = amount;
+  row.tipoProgramacion = type;
+  row.numeroCuotas = installments;
+  if (type === 'cuotas' && finalAmountInput != null) row.importeCuotaFinal = finalAmountInput;
+  else delete row.importeCuotaFinal;
+  if (type === 'mes') {
+    row.mesCargo = startDate;
+    delete row.fechaInicio;
+    delete row.dia;
+  } else {
+    row.fechaInicio = startDate;
+    row.dia = Number(startDate.slice(-2));
+    delete row.mesCargo;
+  }
+  row.frecuencia = type === 'cuotas' ? `${installments} cuotas mensuales` : type === 'mes' ? 'Gasto mensual agregado' : 'Único';
+  row.categoria = type === 'cuotas' ? 'Compra a plazos' : 'Gasto extraordinario';
+  row.observaciones = document.getElementById('scheduled-notes').value.trim();
+  (row.historialFacturas || []).forEach(history => {
+    if (history.estado === 'cobrado') return;
+    const date = parseIsoDate(history.fecha);
+    const historyPeriod = date
+      ? { year: date.getFullYear(), month: date.getMonth() + 1, key: history.fecha.slice(0, 7) }
+      : isMonthKey(history.mes) ? periodFromKey(history.mes) : null;
+    if (!historyPeriod) return;
+    const installmentIndex = scheduledInstallmentIndex(row, historyPeriod);
+    if (installmentIndex != null) history.importe = scheduledPaymentAmount(row, installmentIndex);
+  });
+  if (!existing) data.programados.push(row);
+  closeScheduledPaymentModal();
+  renderScheduledPayments();
+  updateKPIs();
+  showToast(existing ? 'Pago actualizado; pulsa Guardar' : 'Pago programado; pulsa Guardar');
+}
+
 // ── MONTHLY VIEW ────────────────────────────────────────
 const fullMonthNames = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 
@@ -1307,12 +1980,20 @@ function setSelectedMonth(value) {
   const candidate = new Date(Number(match[1]), Number(match[2]) - 1, 1);
   selectedMonth = candidate < MIN_SELECTED_MONTH ? new Date(MIN_SELECTED_MONTH) : candidate;
   renderSection('ingresos');
+  renderSection('gastos');
+  renderSection('sinSuscripcion');
+  renderSection('anuales');
+  renderScheduledPayments();
   updateKPIs();
 }
 function shiftSelectedMonth(offset) {
   const candidate = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth() + offset, 1);
   selectedMonth = candidate < MIN_SELECTED_MONTH ? new Date(MIN_SELECTED_MONTH) : candidate;
   renderSection('ingresos');
+  renderSection('gastos');
+  renderSection('sinSuscripcion');
+  renderSection('anuales');
+  renderScheduledPayments();
   updateKPIs();
 }
 function updateMonthNavigation() {
@@ -1321,6 +2002,27 @@ function updateMonthNavigation() {
 function dateMatchesPeriod(value, period) {
   const match = String(value || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
   return Boolean(match && Number(match[1]) === period.year && Number(match[2]) === period.month);
+}
+function isMonthlyVariableIncome(row) {
+  return Boolean(row.edicionMensual) || /^mensual variable$/i.test(String(row.frecuencia || '').trim());
+}
+function incomeVisibleForPeriod(row, period) {
+  if (!isWithinActiveDates(row, period)) return false;
+  if (isMonthlyVariableIncome(row)) return true;
+  if (row.historialMensual?.[period.key]) return true;
+  if (dateMatchesPeriod(row.fechaIngreso, period)) return true;
+  return /^mensual/i.test(row.frecuencia || '');
+}
+function isMonthKey(value) {
+  const match = String(value || '').match(/^(\d{4})-(\d{2})$/);
+  return Boolean(match && Number(match[2]) >= 1 && Number(match[2]) <= 12);
+}
+function periodFromKey(value) {
+  if (!isMonthKey(value)) return null;
+  return { year: Number(value.slice(0, 4)), month: Number(value.slice(5, 7)), key: value };
+}
+function historyMatchesPeriod(item, period) {
+  return dateMatchesPeriod(item?.fecha, period) || item?.mes === period.key;
 }
 function dayFromDate(value) {
   const match = String(value || '').match(/^\d{4}-\d{2}-(\d{2})$/);
@@ -1332,6 +2034,37 @@ function isWithinActiveDates(row, period) {
   const start = parseIsoDate(row.fechaInicio);
   const end = parseIsoDate(row.fechaFin);
   return (!start || last >= start) && (!end || first <= end);
+}
+function scheduledPaymentDate(row, installmentIndex = 0) {
+  if (row.tipoProgramacion === 'mes') return null;
+  const start = parseIsoDate(row.fechaInicio);
+  if (!start) return null;
+  const targetMonth = new Date(start.getFullYear(), start.getMonth() + installmentIndex, 1);
+  const lastDay = new Date(targetMonth.getFullYear(), targetMonth.getMonth() + 1, 0).getDate();
+  return new Date(targetMonth.getFullYear(), targetMonth.getMonth(), Math.min(start.getDate(), lastDay));
+}
+function scheduledPaymentAmount(row, installmentIndex = 0) {
+  const installments = row.tipoProgramacion === 'cuotas' ? Number(row.numeroCuotas) || 1 : 1;
+  const finalAmount = Number(row.importeCuotaFinal);
+  return installmentIndex === installments - 1 && Number.isFinite(finalAmount)
+    ? finalAmount
+    : Number(row.importe) || 0;
+}
+function scheduledInstallmentIndex(row, period) {
+  if (row.tipoProgramacion === 'mes') return row.mesCargo === period.key ? 0 : null;
+  const installments = row.tipoProgramacion === 'cuotas' ? Number(row.numeroCuotas) || 1 : 1;
+  return Array.from({ length: installments }, (_, index) => index).find(index => {
+    const date = scheduledPaymentDate(row, index);
+    return date && date.getFullYear() === period.year && date.getMonth() + 1 === period.month;
+  });
+}
+function isoLocalDate(date) {
+  if (!(date instanceof Date) || Number.isNaN(date.getTime())) return '';
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
+function formatShortDate(value) {
+  const date = parseIsoDate(value);
+  return date ? date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
 }
 function addPeriodEntry(entries, row, section, amount, options = {}) {
   const numericAmount = Number(amount);
@@ -1348,7 +2081,8 @@ function addPeriodEntry(entries, row, section, amount, options = {}) {
     actual: Boolean(options.actual),
     rowId: String(row.id || ''),
     section,
-    date: options.date || null
+    date: options.date || null,
+    monthOnly: Boolean(options.monthOnly)
   });
 }
 function incomeEntries(row, period, entries) {
@@ -1373,6 +2107,7 @@ function incomeEntries(row, period, entries) {
     });
     return;
   }
+  if (isMonthlyVariableIncome(row)) return;
   if (/^mensual/i.test(row.frecuencia || '')) {
     addPeriodEntry(entries, row, 'ingresos', row.importe, {
       status: 'previsto',
@@ -1418,18 +2153,67 @@ function expenseEntries(row, section, period, entries) {
     detail: row.frecuencia
   });
 }
-function periodEntries() {
-  const period = selectedPeriod();
+function scheduledExpenseEntries(row, period, entries) {
+  const installments = row.tipoProgramacion === 'cuotas' ? Number(row.numeroCuotas) || 1 : 1;
+  const recorded = (row.historialFacturas || []).find(item => historyMatchesPeriod(item, period));
+  if (recorded) {
+    const installmentIndex = scheduledInstallmentIndex(row, period);
+    addPeriodEntry(entries, row, 'programados', recorded.importe, {
+      date: recorded.fecha,
+      status: recorded.estado || 'previsto',
+      detail: installments > 1 && installmentIndex != null ? `Cuota ${installmentIndex + 1} de ${installments}` : row.tipoProgramacion === 'mes' ? 'Gasto del mes' : 'Gasto único',
+      actual: recorded.estado === 'cobrado',
+      monthOnly: row.tipoProgramacion === 'mes'
+    });
+    return;
+  }
+
+  if (row.tipoProgramacion === 'mes' && row.mesCargo === period.key) {
+    addPeriodEntry(entries, row, 'programados', row.importe, {
+      status: 'previsto',
+      detail: 'Gasto del mes',
+      monthOnly: true
+    });
+    return;
+  }
+
+  for (let index = 0; index < installments; index += 1) {
+    const date = scheduledPaymentDate(row, index);
+    if (!date || date.getFullYear() !== period.year || date.getMonth() + 1 !== period.month) continue;
+    addPeriodEntry(entries, row, 'programados', scheduledPaymentAmount(row, index), {
+      date: isoLocalDate(date),
+      status: 'previsto',
+      detail: installments > 1 ? `Cuota ${index + 1} de ${installments}` : 'Gasto único'
+    });
+    break;
+  }
+}
+function expenseRowEntriesForPeriod(row, section, period) {
+  const entries = [];
+  expenseEntries(row, section, period, entries);
+  return entries.filter(entry => entry.rowId === String(row.id || ''));
+}
+function sectionRowVisibleForPeriod(section, row, period) {
+  if (section === 'ingresos') return incomeVisibleForPeriod(row, period);
+  if (['gastos', 'sinSuscripcion', 'anuales'].includes(section)) return expenseRowEntriesForPeriod(row, section, period).length > 0;
+  return true;
+}
+function periodEntriesFor(period) {
   const entries = [];
   (data.ingresos || []).forEach(row => incomeEntries(row, period, entries));
   ['gastos','sinSuscripcion','anuales'].forEach(section => {
     (data[section] || []).forEach(row => expenseEntries(row, section, period, entries));
   });
+  (data.programados || []).forEach(row => scheduledExpenseEntries(row, period, entries));
+
   return entries.sort((a, b) =>
     (a.day ?? 99) - (b.day ?? 99) ||
     (a.type === b.type ? 0 : a.type === 'expense' ? -1 : 1) ||
     a.element.localeCompare(b.element, 'es')
   );
+}
+function periodEntries() {
+  return periodEntriesFor(selectedPeriod());
 }
 function findMovementRow(section, rowId) {
   return (data[section] || []).find(row => String(row.id || '') === String(rowId));
@@ -1447,7 +2231,17 @@ function updateMovementDate(section, rowId, value) {
   const day = dayFromDate(value);
   const monthly = /^mensual/i.test(row.frecuencia || '');
 
-  if (section === 'ingresos') {
+  if (section === 'programados') {
+    row.historialFacturas = row.historialFacturas || [];
+    let history = row.historialFacturas.find(item => dateMatchesPeriod(item.fecha, period));
+    if (!history) {
+      const installmentIndex = scheduledInstallmentIndex(row, period) ?? 0;
+      history = { fecha: value, importe: scheduledPaymentAmount(row, installmentIndex), estado: 'previsto' };
+      row.historialFacturas.push(history);
+    } else {
+      history.fecha = value;
+    }
+  } else if (section === 'ingresos') {
     const history = row.historialMensual && row.historialMensual[period.key];
     if (history) history.fecha = value;
     else if (dateMatchesPeriod(row.fechaIngreso, period)) row.fechaIngreso = value;
@@ -1460,6 +2254,7 @@ function updateMovementDate(section, rowId, value) {
     }
     row.dia = day;
   }
+  if (section === 'programados') renderScheduledPayments();
   updateKPIs();
 }
 function updateMovementStatus(section, rowId, status) {
@@ -1484,16 +2279,20 @@ function updateMovementStatus(section, rowId, status) {
     }
   } else {
     row.historialFacturas = row.historialFacturas || [];
-    let history = row.historialFacturas.find(item => dateMatchesPeriod(item.fecha, period));
+    let history = row.historialFacturas.find(item => historyMatchesPeriod(item, period));
     if (!history) {
-      const amount = row.cuotaFinalProrrateada && dateMatchesPeriod(row.cuotaFinalProrrateada.fecha, period)
-        ? row.cuotaFinalProrrateada.importe
-        : row.importe;
+      const installmentIndex = section === 'programados' ? scheduledInstallmentIndex(row, period) : null;
+      const amount = section === 'programados'
+        ? scheduledPaymentAmount(row, installmentIndex ?? 0)
+        : row.cuotaFinalProrrateada && dateMatchesPeriod(row.cuotaFinalProrrateada.fecha, period)
+          ? row.cuotaFinalProrrateada.importe
+          : row.importe;
       history = {
-        fecha: dateForPeriodDay(period, row.dia || 1),
         importe: Number(amount) || 0,
         estado: normalized
       };
+      if (section === 'programados' && row.tipoProgramacion === 'mes') history.mes = period.key;
+      else history.fecha = dateForPeriodDay(period, row.dia || 1);
       row.historialFacturas.push(history);
     } else {
       history.estado = normalized;
@@ -1510,9 +2309,14 @@ function renderMonthlyOverview(entries) {
   title.textContent = `Movimientos de ${fullMonthNames[period.month - 1]} de ${period.year}`;
   updateMonthNavigation();
 
-  const opening = Number(data.saldosIniciales?.[period.key]);
-  const hasOpening = Number.isFinite(opening);
-  document.getElementById('month-opening-balance').value = hasOpening ? formatEditableAmount(opening) : '';
+  const openingRecord = openingBalanceForPeriod(period);
+  document.getElementById('month-opening-balance').value = Number.isFinite(openingRecord.amount) ? formatEditableAmount(openingRecord.amount) : '';
+  document.getElementById('month-opening-source').textContent = openingRecord.source === 'linked'
+    ? `Enlazado con el cierre confirmado de ${openingRecord.previousKey}`
+    : openingRecord.source === 'projected' ? `Arrastrado desde el cierre estimado de ${openingRecord.previousKey}`
+    : openingRecord.source === 'manual' ? 'Valor manual' : 'Sin saldo anterior confirmado';
+  const confirmedClosing = Number(data.saldosFinalesConfirmados?.[period.key]);
+  document.getElementById('month-confirmed-closing').value = Number.isFinite(confirmedClosing) ? formatEditableAmount(confirmedClosing) : '';
   renderClosingBalance(entries, period);
 
   if (!entries.length) {
@@ -1527,8 +2331,11 @@ function renderMonthlyOverview(entries) {
     const sign = entry.type === 'income' ? '+' : '−';
     const dotStyle = entry.color ? `background:${entry.color};border-color:${entry.color}` : '';
     const status = entry.status === 'cobrado' ? 'cobrado' : 'previsto';
+    const periodControl = entry.monthOnly
+      ? '<div class="month-period-label">Durante el mes</div>'
+      : `<input class="month-date-input" type="date" min="${firstDate}" max="${lastDate}" value="${dateValue}" data-section="${entry.section}" data-row-id="${escapeHtml(entry.rowId)}" aria-label="Fecha de ${escapeHtml(entry.element)}">`;
     return `<div class="month-row ${entry.type}">
-      <input class="month-date-input" type="date" min="${firstDate}" max="${lastDate}" value="${dateValue}" data-section="${entry.section}" data-row-id="${escapeHtml(entry.rowId)}" aria-label="Fecha de ${escapeHtml(entry.element)}">
+      ${periodControl}
       <div class="month-movement">
         <div class="month-movement-main"><span class="month-dot" style="${dotStyle}"></span><span class="month-name">${escapeHtml(entry.element)}</span></div>
         <div class="month-meta">${escapeHtml(entry.detail)}</div>
@@ -1551,6 +2358,8 @@ function renderMonthlyOverview(entries) {
 
 // ── HELPERS ────────────────────────────────────────────
 function rowIdx(s, tr) {
+  const sourceIndex = Number.parseInt(tr.dataset.sourceIndex, 10);
+  if (Number.isInteger(sourceIndex)) return sourceIndex;
   return Array.from(document.querySelector(`#table-${s} tbody`).children).indexOf(tr);
 }
 function mk(tag, cls) {
@@ -1592,9 +2401,14 @@ function formatEditableAmount(value) {
   return new Intl.NumberFormat('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
 }
 function tableAmount(row, section) {
-  if (section === 'ingresos' && row.edicionMensual) {
+  if (section === 'ingresos') {
     const amount = Number(row.historialMensual?.[selectedPeriod().key]?.importe);
-    return Number.isFinite(amount) ? amount : null;
+    if (Number.isFinite(amount)) return amount;
+    if (isMonthlyVariableIncome(row)) return null;
+  }
+  if (['gastos', 'sinSuscripcion', 'anuales'].includes(section)) {
+    const entries = expenseRowEntriesForPeriod(row, section, selectedPeriod());
+    return entries.length ? entries.reduce((sum, entry) => sum + entry.amount, 0) : null;
   }
   const amount = Number(row.importe);
   return Number.isFinite(amount) ? amount : null;
@@ -1619,7 +2433,46 @@ function updateMonthlyIncome(row, amount, notify = true) {
     row.historialMensual[period.key] = history;
   }
   renderSection('sinSuscripcion');
-  if (notify) showToast(amount == null ? 'Importe mensual eliminado; pulsa Guardar' : 'Importe mensual actualizado; pulsa Guardar');
+  if (notify) showToast(amount == null ? 'Importe del mes eliminado; pulsa Guardar' : 'Importe del mes actualizado; pulsa Guardar');
+}
+function previousPeriodKey(period) {
+  const previous = new Date(period.year, period.month - 2, 1);
+  return `${previous.getFullYear()}-${String(previous.getMonth() + 1).padStart(2, '0')}`;
+}
+function projectionContextForPeriod(period) {
+  let balance = null;
+  const cursor = new Date(MIN_SELECTED_MONTH);
+  const target = new Date(period.year, period.month - 1, 1);
+  while (cursor < target) {
+    const cursorPeriod = {
+      year: cursor.getFullYear(),
+      month: cursor.getMonth() + 1,
+      key: `${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, '0')}`
+    };
+    const cursorOpening = Number(data.saldosIniciales?.[cursorPeriod.key]);
+    if (Number.isFinite(cursorOpening)) balance = cursorOpening;
+    if (Number.isFinite(balance)) {
+      const entries = periodEntriesFor(cursorPeriod);
+      const confirmed = Number(data.saldosFinalesConfirmados?.[cursorPeriod.key]);
+      if (Number.isFinite(confirmed)) {
+        balance = confirmed;
+      } else {
+        balance += entries.reduce((sum, entry) => sum + (entry.type === 'income' ? entry.amount : -entry.amount), 0);
+      }
+    }
+    cursor.setMonth(cursor.getMonth() + 1);
+  }
+
+  const explicit = Number(data.saldosIniciales?.[period.key]);
+  const previousKey = previousPeriodKey(period);
+  const linked = Number(data.saldosFinalesConfirmados?.[previousKey]);
+  const openingBalance = Number.isFinite(explicit) ? explicit : Number.isFinite(linked) ? linked : balance;
+  const source = Number.isFinite(explicit) ? 'manual' : Number.isFinite(linked) ? 'linked' : Number.isFinite(balance) ? 'projected' : 'missing';
+  return { openingBalance: Number.isFinite(openingBalance) ? roundMoney(openingBalance) : null, source, previousKey };
+}
+function openingBalanceForPeriod(period) {
+  const context = projectionContextForPeriod(period);
+  return { amount: context.openingBalance, source: context.source, previousKey: context.previousKey };
 }
 function updateOpeningBalance(value) {
   const period = selectedPeriod();
@@ -1630,19 +2483,50 @@ function updateOpeningBalance(value) {
   renderClosingBalance(periodEntries(), period);
 }
 function renderClosingBalance(entries, period = selectedPeriod()) {
-  const opening = Number(data.saldosIniciales?.[period.key]);
+  const openingRecord = openingBalanceForPeriod(period);
+  const opening = openingRecord.amount;
   const hasOpening = Number.isFinite(opening);
   const movementBalance = entries.reduce((sum, entry) => sum + (entry.type === 'income' ? entry.amount : -entry.amount), 0);
+  const confirmed = Number(data.saldosFinalesConfirmados?.[period.key]);
+  const hasConfirmed = Number.isFinite(confirmed);
+  const mappedClosing = hasOpening ? opening + movementBalance : null;
+  const displayed = hasConfirmed ? confirmed : mappedClosing;
+  const reconciliation = document.getElementById('month-closing-reconciliation');
+  if (hasConfirmed && Number.isFinite(mappedClosing)) {
+    const difference = confirmed - mappedClosing;
+    reconciliation.textContent = Math.abs(difference) < 0.005
+      ? 'Conciliado con todos los movimientos registrados.'
+      : `Diferencia pendiente respecto al mapa: ${difference >= 0 ? '+' : '−'}${eur(Math.abs(difference))}`;
+  } else {
+    reconciliation.textContent = 'Se enlaza automáticamente con el mes siguiente.';
+  }
+  document.getElementById('kpi-closing-label').textContent = hasConfirmed ? 'Saldo final confirmado' : 'Saldo final estimado';
   const closing = document.getElementById('kpi-closing-balance');
-  closing.textContent = hasOpening ? eur(opening + movementBalance) : '—';
-  closing.className = `kpi-val${hasOpening ? (opening + movementBalance >= 0 ? ' pos' : ' neg') : ''}`;
+  closing.textContent = Number.isFinite(displayed) ? eur(displayed) : '—';
+  closing.className = `kpi-val${Number.isFinite(displayed) ? (displayed >= 0 ? ' pos' : ' neg') : ''}`;
 }
 function finalizeOpeningBalance() {
   const period = selectedPeriod();
-  const amount = Number(data.saldosIniciales?.[period.key]);
+  const openingRecord = openingBalanceForPeriod(period);
+  document.getElementById('month-opening-balance').value = Number.isFinite(openingRecord.amount) ? formatEditableAmount(openingRecord.amount) : '';
+  updateKPIs();
+  showToast(openingRecord.source === 'linked' ? 'Saldo inicial enlazado con el cierre anterior' : openingRecord.source === 'projected' ? 'Saldo inicial arrastrado desde la estimación anterior' : openingRecord.source === 'manual' ? 'Saldo inicial manual actualizado; pulsa Guardar' : 'Saldo inicial eliminado; pulsa Guardar');
+}
+function updateConfirmedClosing(value) {
+  const period = selectedPeriod();
+  data.saldosFinalesConfirmados = data.saldosFinalesConfirmados || {};
+  const amount = parseLocalizedAmount(value);
+  if (amount == null) delete data.saldosFinalesConfirmados[period.key];
+  else data.saldosFinalesConfirmados[period.key] = amount;
+  renderClosingBalance(periodEntries(), period);
+}
+function finalizeConfirmedClosing() {
+  const period = selectedPeriod();
+  const amount = Number(data.saldosFinalesConfirmados?.[period.key]);
   const hasAmount = Number.isFinite(amount);
-  document.getElementById('month-opening-balance').value = hasAmount ? formatEditableAmount(amount) : '';
-  showToast(hasAmount ? 'Saldo inicial actualizado; pulsa Guardar' : 'Saldo inicial eliminado; pulsa Guardar');
+  document.getElementById('month-confirmed-closing').value = hasAmount ? formatEditableAmount(amount) : '';
+  updateKPIs();
+  showToast(hasAmount ? 'Cierre confirmado y enlazado con el mes siguiente; pulsa Guardar' : 'Cierre confirmado eliminado; pulsa Guardar');
 }
 function ensurePlanFields(row, section) {
   if (!row.frecuencia) row.frecuencia = defaultFrequency(section);
@@ -1695,10 +2579,18 @@ function applyObservation() {
 function migrateFinanceData() {
   // Migración aditiva: no borra ni reinterpreta los datos y notas existentes.
   if (!data.saldosIniciales || typeof data.saldosIniciales !== 'object' || Array.isArray(data.saldosIniciales)) data.saldosIniciales = {};
+  if (!data.saldosFinalesConfirmados || typeof data.saldosFinalesConfirmados !== 'object' || Array.isArray(data.saldosFinalesConfirmados)) data.saldosFinalesConfirmados = {};
+  if (!Array.isArray(data.programados)) data.programados = [];
   ['ingresos','gastos','sinSuscripcion','anuales'].forEach(section => {
     (data[section] || []).forEach(row => ensurePlanFields(row, section));
   });
-  data.planificacionVersion = Math.max(Number(data.planificacionVersion) || 0, 5);
+  data.programados.forEach(row => {
+    row.tipoProgramacion = ['cuotas', 'mes'].includes(row.tipoProgramacion) ? row.tipoProgramacion : 'unico';
+    row.numeroCuotas = row.tipoProgramacion === 'cuotas' ? Math.max(2, Math.min(36, Number(row.numeroCuotas) || 3)) : 1;
+    row.historialFacturas = Array.isArray(row.historialFacturas) ? row.historialFacturas : [];
+    if (!Number.isFinite(Number(row.importeCuotaFinal)) || Number(row.importeCuotaFinal) <= 0) delete row.importeCuotaFinal;
+  });
+  data.planificacionVersion = Math.max(Number(data.planificacionVersion) || 0, 7);
 }
 function monthlyEquivalent(row) {
   if (Number.isFinite(Number(row.presupuestoMensual))) return Number(row.presupuestoMensual);
@@ -1746,8 +2638,16 @@ function updateSortArrow(s) {
 
 // ── KPIs ───────────────────────────────────────────────
 function sumSection(s) {
-  return (data[s] || []).reduce((sum, row) =>
-    sum + (s !== 'ingresos' && row.pendienteRenovacion ? 0 : (Number(row.importe) || 0)), 0);
+  const period = selectedPeriod();
+  return (data[s] || []).reduce((sum, row) => {
+    if (s !== 'ingresos' && row.pendienteRenovacion) return sum;
+    if (s === 'gastos') {
+      const chargeDay = Number.isInteger(Number(row.dia)) ? Number(row.dia) : 1;
+      const chargeDate = new Date(period.year, period.month - 1, Math.min(chargeDay, new Date(period.year, period.month, 0).getDate()));
+      if (isSuspended(row, chargeDate)) return sum;
+    }
+    return sum + (Number(row.importe) || 0);
+  }, 0);
 }
 function monthlyExpenses() {
   const today = new Date();
@@ -1763,11 +2663,10 @@ function escapeHtml(value) {
 function updateTotals(s) {
   const map = { ingresos:'total-ingresos', gastos:'total-gastos', sinSuscripcion:'total-no-mensuales', anuales:'total-anuales' };
   if (!map[s]) return;
-  const total = s === 'sinSuscripcion'
-    ? (data[s] || []).reduce((sum, row) => sum + (row.pendienteRenovacion ? 0 : monthlyEquivalent(row)), 0)
-    : s === 'ingresos'
-      ? (data[s] || []).reduce((sum, row) => sum + (tableAmount(row, s) || 0), 0)
-      : sumSection(s);
+  const period = selectedPeriod();
+  const total = (data[s] || [])
+    .filter(row => sectionRowVisibleForPeriod(s, row, period))
+    .reduce((sum, row) => sum + (tableAmount(row, s) || 0), 0);
   document.getElementById(map[s]).textContent = eur(total);
 }
 function updateKPIs() {
@@ -1782,6 +2681,7 @@ function updateKPIs() {
   ks.className = 'kpi-val ' + (balance >= 0 ? 'pos' : 'neg');
   renderMonthlyOverview(entries);
   ['ingresos','gastos','sinSuscripcion','anuales'].forEach(updateTotals);
+  updateScheduledPaymentsTotal();
 }
 
 // ── ADD ────────────────────────────────────────────────
@@ -1819,6 +2719,7 @@ async function saveData() {
 }
 
 function openPasswordModal() {
+  document.getElementById('security-menu').open = false;
   document.getElementById('password-form').reset();
   document.getElementById('password-error').textContent = '';
   document.getElementById('password-modal').hidden = false;
@@ -1855,6 +2756,7 @@ async function changePassword(event) {
   }
 }
 function exportVault() {
+  document.getElementById('security-menu').open = false;
   if (!currentVault) return;
   const blob = new Blob([`${JSON.stringify(currentVault, null, 2)}\n`], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
@@ -1866,6 +2768,7 @@ function exportVault() {
   showToast('Backup cifrado descargado');
 }
 async function importVault(event) {
+  document.getElementById('security-menu').open = false;
   const file = event.target.files?.[0];
   event.target.value = '';
   if (!file) return;
@@ -1889,13 +2792,19 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2500);
 }
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape' && !document.getElementById('password-modal').hidden) {
-    closePasswordModal();
-    return;
-  }
-  if (e.key === 'Escape' && !document.getElementById('observation-modal').hidden) {
-    closeObservationModal();
-    return;
+  if (e.key === 'Escape') {
+    if (!document.getElementById('password-modal').hidden) {
+      closePasswordModal();
+      return;
+    }
+    if (!document.getElementById('scheduled-payment-modal').hidden) {
+      closeScheduledPaymentModal();
+      return;
+    }
+    if (!document.getElementById('observation-modal').hidden) {
+      closeObservationModal();
+      return;
+    }
   }
   if ((e.metaKey||e.ctrlKey) && e.key==='s') { e.preventDefault(); saveData(); }
 });
@@ -1904,8 +2813,10 @@ document.getElementById('password-form').addEventListener('submit', changePasswo
 // ── DEFAULT DATA ───────────────────────────────────────
 function getDefaultData() {
   return {
-    planificacionVersion: 5,
+    planificacionVersion: 7,
     saldosIniciales: {},
+    saldosFinalesConfirmados: {},
+    programados: [],
     ingresos: [],
     gastos: [],
     sinSuscripcion: [],
