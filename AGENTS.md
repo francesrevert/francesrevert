@@ -14,11 +14,14 @@ almacén compartido y solo puede contener datos y credenciales cifrados.
 - No debilitar AES-256-GCM, PBKDF2-SHA256, el número de iteraciones ni la CSP sin una
   justificación explícita y una revisión de seguridad.
 - No mover `vault.json` a `main` ni a `docs/`: la web pública debe contener solo la aplicación.
+- Los movimientos enviados desde ChatGPT solo pueden guardarse temporalmente en el repositorio
+  privado `francesrevert/finanzas-entrada`; nunca en este repositorio público.
+- La bandeja privada debe importarse únicamente después de desbloquear la aplicación y sus archivos
+  procesados deben eliminarse. La idempotencia se mantiene mediante `chatSourceId`.
 - Conservar el control de concurrencia mediante el SHA de GitHub al actualizar el vault.
 - No añadir analítica, fuentes remotas, CDN, telemetría ni solicitudes de red distintas
   de `https://api.github.com`.
-- Los cambios solicitados desde ChatGPT afectan al código y a la estructura. El contenido
-  financiero cifrado no debe descifrarse ni editarse desde el chat.
+- El contenido financiero cifrado no debe descifrarse ni editarse desde el chat.
 
 ## Publicación
 
