@@ -185,11 +185,6 @@ header {
   font-size: 20px;
   letter-spacing: .05em;
 }
-.month-subtitle {
-  color: var(--text-muted);
-  font-size: 11px;
-  margin-top: 1px;
-}
 .month-controls { display: flex; align-items: center; gap: 6px; }
 .month-nav {
   width: 30px; height: 30px;
@@ -601,18 +596,6 @@ tr:hover .del-btn { opacity: 1; }
 .upcoming-day { color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
 .upcoming-meta { color: var(--text-muted); font-size: 11px; }
 
-/* ── HINT ──────────────────────────────────────────── */
-.hint-bar {
-  margin-top: 40px; padding: 14px 18px;
-  border: 1px solid var(--border); background: var(--bg2);
-  display: flex; align-items: center; justify-content: space-between; gap: 16px;
-}
-.hint-text { font-size: 12px; color: var(--text-muted); }
-.hint-text code {
-  font-size: 11px; background: var(--surface2); padding: 1px 5px;
-  border: 1px solid var(--border);
-}
-
 /* ── TOAST ─────────────────────────────────────────── */
 #toast {
   position: fixed; bottom: 22px; right: 22px;
@@ -707,8 +690,7 @@ header {
 }
 .month-section,
 table,
-.tfoot,
-.hint-bar { border-color: var(--border); }
+.tfoot { border-color: var(--border); }
 .month-section { margin-bottom: clamp(3rem, 6vw, 5rem); background: var(--soft-surface); }
 .month-toolbar { padding: clamp(18px, 2.5vw, 28px); background: var(--bg2); }
 .month-title {
@@ -718,7 +700,6 @@ table,
   line-height: 1;
   letter-spacing: -.04em;
 }
-.month-subtitle { max-width: 680px; margin-top: 8px; font-size: 12px; }
 .month-controls { gap: 8px; }
 .month-nav,
 .month-picker,
@@ -796,7 +777,6 @@ td.td-del { padding-block: 11px !important; }
 .modal-btn:hover { border-color: var(--blue); color: var(--blue); }
 .modal-btn.primary { border-color: var(--text); background: var(--text); color: var(--bg); }
 .modal-btn.primary:hover { border-color: var(--blue); background: var(--blue); color: #fff; }
-.hint-bar { padding: 18px 20px; background: var(--bg2); }
 #toast { padding: 12px 18px; background: var(--text); color: var(--bg); font-weight: 600; box-shadow: var(--shadow); }
 
 /* ── SECURE ACCESS ─────────────────────────────────── */
@@ -828,7 +808,6 @@ td.td-del { padding-block: 11px !important; }
   text-transform: uppercase;
 }
 .access-title { margin-bottom: 8px; font-size: 20px; }
-.access-copy { margin-bottom: 20px; color: var(--text-muted); font-size: 12px; }
 .access-label { display: block; margin: 13px 0 5px; color: var(--text-muted); font-size: 11px; }
 .access-input {
   width: 100%; height: 42px; padding: 0 11px;
@@ -843,8 +822,6 @@ td.td-del { padding-block: 11px !important; }
 }
 .access-submit:disabled { opacity: .5; cursor: wait; }
 .access-error { min-height: 18px; margin-top: 10px; color: var(--red); font-size: 12px; }
-.access-note { margin-top: 18px; padding-top: 15px; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 11px; }
-.password-strength { margin-top: 6px; color: var(--text-muted); font-size: 11px; }
 .file-input { display: none; }
 .security-menu { position: relative; }
 .security-menu > summary {
@@ -1022,25 +999,20 @@ td.td-del { padding-block: 11px !important; }
 <section class="access-screen" id="access-screen" aria-labelledby="access-title">
   <form class="access-card" id="access-form" autocomplete="off">
     <div class="access-brand">Manolo y María</div>
-    <div class="access-kicker">Finanzas cifradas</div>
-    <h1 class="access-title" id="access-title">Acceso privado</h1>
-    <p class="access-copy" id="access-copy">Identifícate ante GitHub y usa la contraseña para descifrar la copia compartida.</p>
+    <div class="access-kicker">Finanzas</div>
+    <h1 class="access-title" id="access-title">Acceso</h1>
     <div id="unlock-fields">
-      <label class="access-label" for="github-token">Token de GitHub</label>
-      <input class="access-input" id="github-token" type="password" autocomplete="off" spellcheck="false" required>
       <label class="access-label" for="access-password">Contraseña</label>
       <input class="access-input" id="access-password" type="password" autocomplete="current-password" required>
     </div>
     <div id="change-fields" hidden>
       <label class="access-label" for="new-password">Nueva contraseña</label>
-      <input class="access-input" id="new-password" type="password" autocomplete="new-password" minlength="12">
+      <input class="access-input" id="new-password" type="password" autocomplete="new-password" minlength="16">
       <label class="access-label" for="confirm-password">Repite la nueva contraseña</label>
-      <input class="access-input" id="confirm-password" type="password" autocomplete="new-password" minlength="12">
-      <div class="password-strength">Mínimo 12 caracteres. Se recomienda una frase larga y exclusiva.</div>
+      <input class="access-input" id="confirm-password" type="password" autocomplete="new-password" minlength="16">
     </div>
     <button class="access-submit" id="access-submit" type="submit">Desbloquear</button>
     <div class="access-error" id="access-error" role="alert"></div>
-    <p class="access-note">La contraseña nunca sale del dispositivo. El token se envía únicamente a la API de GitHub y se conserva solo mientras la pestaña permanezca abierta.</p>
   </form>
 </section>
 
@@ -1086,7 +1058,6 @@ td.td-del { padding-block: 11px !important; }
       <div class="month-toolbar">
         <div class="month-title-wrap">
           <div class="month-title" id="month-title">Movimientos del mes</div>
-          <div class="month-subtitle">Edita el día recurrente y marca cada movimiento mensual como previsto o cobrado.</div>
         </div>
         <div class="month-controls">
           <button class="month-nav" id="month-prev" type="button" onclick="shiftSelectedMonth(-1)" aria-label="Mes anterior">‹</button>
@@ -1224,14 +1195,10 @@ td.td-del { padding-block: 11px !important; }
         <div class="month-finance-item">
           <label class="month-finance-label" for="month-confirmed-closing">Saldo final confirmado</label>
           <input class="month-opening-input" id="month-confirmed-closing" type="text" inputmode="decimal" placeholder="Confirma el cierre bancario" oninput="updateConfirmedClosing(this.value)" onblur="finalizeConfirmedClosing()">
-          <span class="month-finance-note" id="month-closing-reconciliation">Se enlaza automáticamente con el mes siguiente.</span>
+          <span class="month-finance-note" id="month-closing-reconciliation"></span>
         </div>
       </div>
     </details>
-
-    <div class="hint-bar">
-      <span class="hint-text">Al pulsar Guardar, la copia cifrada se actualiza en GitHub para todos los dispositivos.</span>
-    </div>
 
   </div>
 </div>
@@ -1246,9 +1213,9 @@ td.td-del { padding-block: 11px !important; }
       <label class="modal-label" for="password-current">Contraseña actual</label>
       <input class="access-input" id="password-current" type="password" autocomplete="current-password" required>
       <label class="modal-label" for="password-new">Nueva contraseña</label>
-      <input class="access-input" id="password-new" type="password" autocomplete="new-password" minlength="12" required>
+      <input class="access-input" id="password-new" type="password" autocomplete="new-password" minlength="16" required>
       <label class="modal-label" for="password-confirm">Repite la nueva contraseña</label>
-      <input class="access-input" id="password-confirm" type="password" autocomplete="new-password" minlength="12" required>
+      <input class="access-input" id="password-confirm" type="password" autocomplete="new-password" minlength="16" required>
       <div class="access-error" id="password-error" role="alert"></div>
     </div>
     <div class="modal-actions">
@@ -1331,7 +1298,7 @@ td.td-del { padding-block: 11px !important; }
 <script>
 const GITHUB_OWNER = 'francesrevert';
 const GITHUB_REPO = 'francesrevert';
-const GITHUB_BRANCH = 'main';
+const GITHUB_BRANCH = 'data';
 const VAULT_PATH = 'vault.json';
 const GITHUB_API_VERSION = '2022-11-28';
 const PBKDF2_ITERATIONS = 600000;
@@ -1400,24 +1367,22 @@ function validateVault(vault) {
   return vault;
 }
 function githubHeaders(token) {
-  return {
+  const headers = {
     Accept: 'application/vnd.github+json',
-    Authorization: `Bearer ${token}`,
     'X-GitHub-Api-Version': GITHUB_API_VERSION
   };
+  if (token) headers.Authorization = `Bearer ${token}`;
+  return headers;
 }
 function vaultApiUrl() {
   return `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${VAULT_PATH}`;
 }
-async function fetchRemoteVault(token) {
+async function fetchRemoteVault() {
   const response = await fetch(`${vaultApiUrl()}?ref=${encodeURIComponent(GITHUB_BRANCH)}`, {
-    headers: githubHeaders(token), cache: 'no-store'
+    headers: githubHeaders(), cache: 'no-store'
   });
-  if (response.status === 401 || response.status === 403) {
-    throw new Error('GitHub ha rechazado el token. Comprueba que siga vigente y tenga permiso Contents: read and write.');
-  }
-  if (response.status === 404) throw new Error('GitHub no encuentra el archivo cifrado o el token no tiene acceso al repositorio.');
-  if (!response.ok) throw new Error(`GitHub no ha podido leer los datos (${response.status}).`);
+  if (response.status === 404) throw new Error('No se ha podido cargar la información.');
+  if (!response.ok) throw new Error('No se ha podido cargar la información.');
   const result = await response.json();
   const raw = decoder.decode(base64ToBytes(String(result.content || '').replace(/\s/g, '')));
   return { vault: validateVault(JSON.parse(raw)), sha: result.sha };
@@ -1430,8 +1395,8 @@ async function putRemoteVault(vault, message) {
     body: JSON.stringify({ message, content, sha: remoteVaultSha, branch: GITHUB_BRANCH })
   });
   if (response.status === 409) throw new Error('Otra persona ha guardado cambios antes. Sal y vuelve a entrar para cargar la última versión.');
-  if (response.status === 401 || response.status === 403) throw new Error('GitHub ha rechazado el guardado. Revisa el token y su permiso Contents: read and write.');
-  if (!response.ok) throw new Error(`GitHub no ha podido guardar los datos (${response.status}).`);
+  if (response.status === 401 || response.status === 403) throw new Error('No se ha podido guardar. Contacta con el administrador.');
+  if (!response.ok) throw new Error('No se ha podido guardar.');
   const result = await response.json();
   remoteVaultSha = result.content.sha;
   currentVault = vault;
@@ -1467,9 +1432,21 @@ async function createVault(password, payload, forcePasswordChange = false) {
     }
   };
 }
+function buildVaultPayload() {
+  return { schema: 1, repositoryToken: githubToken, financeData: data };
+}
+function validateVaultPayload(payload) {
+  if (payload?.schema !== 1 || typeof payload.repositoryToken !== 'string' || !payload.repositoryToken.startsWith('github_pat_')) {
+    throw new Error('La copia cifrada no contiene una credencial de guardado válida.');
+  }
+  if (!payload.financeData || typeof payload.financeData !== 'object' || Array.isArray(payload.financeData)) {
+    throw new Error('La copia cifrada no contiene datos financieros válidos.');
+  }
+  return payload;
+}
 async function persistEncryptedData() {
   if (!githubToken || !vaultKey || !currentVault || !data) throw new Error('La sesión está bloqueada.');
-  const encrypted = await encryptData(vaultKey, data);
+  const encrypted = await encryptData(vaultKey, buildVaultPayload());
   await putRemoteVault(
     { ...currentVault, ...encrypted, forcePasswordChange: false, updatedAt: new Date().toISOString() },
     `finanzas: actualizar datos ${new Date().toLocaleString('es-ES')}`
@@ -1483,8 +1460,7 @@ function setAccessBusy(busy) {
 function setAccessError(message = '') { document.getElementById('access-error').textContent = message; }
 function showBootstrapChange() {
   accessMode = 'bootstrap-change';
-  document.getElementById('access-title').textContent = 'Crea una contraseña nueva';
-  document.getElementById('access-copy').textContent = 'La clave temporal ha sido validada. Este cambio es obligatorio antes de entrar.';
+  document.getElementById('access-title').textContent = 'Nueva contraseña';
   document.getElementById('unlock-fields').hidden = true;
   document.getElementById('change-fields').hidden = false;
   document.getElementById('new-password').required = true;
@@ -1494,7 +1470,7 @@ function showBootstrapChange() {
   document.getElementById('new-password').focus();
 }
 function validateNewPassword(password, confirmation) {
-  if (password.length < 12) return 'La contraseña debe tener al menos 12 caracteres.';
+  if (password.length < 16) return 'Usa al menos 16 caracteres.';
   if (password !== confirmation) return 'Las contraseñas no coinciden.';
   return '';
 }
@@ -1508,7 +1484,7 @@ async function handleAccess(event) {
       const confirmation = document.getElementById('confirm-password').value;
       const validation = validateNewPassword(password, confirmation);
       if (validation) throw new Error(validation);
-      const created = await createVault(password, data);
+      const created = await createVault(password, buildVaultPayload());
       await putRemoteVault(created.vault, 'seguridad: sustituir contraseña temporal');
       vaultKey = created.key;
       document.getElementById('new-password').value = '';
@@ -1516,19 +1492,16 @@ async function handleAccess(event) {
       openApp();
       return;
     }
-    const tokenInput = document.getElementById('github-token');
     const passwordInput = document.getElementById('access-password');
-    const token = tokenInput.value.trim();
-    if (!token) throw new Error('Introduce el token de GitHub.');
-    const remote = await fetchRemoteVault(token);
+    const remote = await fetchRemoteVault();
     const unlocked = await decryptVault(remote.vault, passwordInput.value);
-    tokenInput.value = '';
+    const payload = validateVaultPayload(unlocked.payload);
     passwordInput.value = '';
-    githubToken = token;
+    githubToken = payload.repositoryToken;
     remoteVaultSha = remote.sha;
     currentVault = remote.vault;
     vaultKey = unlocked.key;
-    data = unlocked.payload;
+    data = payload.financeData;
     if (currentVault.forcePasswordChange) { showBootstrapChange(); return; }
     openApp();
   } catch (error) {
@@ -1557,7 +1530,7 @@ function lockApp() {
 }
 function initAccess() {
   document.getElementById('access-form').addEventListener('submit', handleAccess);
-  document.getElementById('github-token').focus();
+  document.getElementById('access-password').focus();
   ['pointerdown', 'keydown', 'touchstart'].forEach(name => {
     document.addEventListener(name, () => { lastActivityAt = Date.now(); }, { passive: true });
   });
@@ -2312,9 +2285,9 @@ function renderMonthlyOverview(entries) {
   const openingRecord = openingBalanceForPeriod(period);
   document.getElementById('month-opening-balance').value = Number.isFinite(openingRecord.amount) ? formatEditableAmount(openingRecord.amount) : '';
   document.getElementById('month-opening-source').textContent = openingRecord.source === 'linked'
-    ? `Enlazado con el cierre confirmado de ${openingRecord.previousKey}`
-    : openingRecord.source === 'projected' ? `Arrastrado desde el cierre estimado de ${openingRecord.previousKey}`
-    : openingRecord.source === 'manual' ? 'Valor manual' : 'Sin saldo anterior confirmado';
+    ? `Cierre ${openingRecord.previousKey}`
+    : openingRecord.source === 'projected' ? `Estimado ${openingRecord.previousKey}`
+    : openingRecord.source === 'manual' ? 'Manual' : '';
   const confirmedClosing = Number(data.saldosFinalesConfirmados?.[period.key]);
   document.getElementById('month-confirmed-closing').value = Number.isFinite(confirmedClosing) ? formatEditableAmount(confirmedClosing) : '';
   renderClosingBalance(entries, period);
@@ -2498,7 +2471,7 @@ function renderClosingBalance(entries, period = selectedPeriod()) {
       ? 'Conciliado con todos los movimientos registrados.'
       : `Diferencia pendiente respecto al mapa: ${difference >= 0 ? '+' : '−'}${eur(Math.abs(difference))}`;
   } else {
-    reconciliation.textContent = 'Se enlaza automáticamente con el mes siguiente.';
+    reconciliation.textContent = '';
   }
   document.getElementById('kpi-closing-label').textContent = hasConfirmed ? 'Saldo final confirmado' : 'Saldo final estimado';
   const closing = document.getElementById('kpi-closing-balance');
@@ -2703,7 +2676,7 @@ async function saveData() {
 
     btn.classList.add('ok');
     btn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Guardado`;
-    showToast('Datos guardados en GitHub');
+    showToast('Guardado');
     setTimeout(() => {
       btn.classList.remove('ok');
       btn.disabled = false;
@@ -2746,7 +2719,7 @@ async function changePassword(event) {
   if (nextPassword === currentPassword) { errorTarget.textContent = 'La nueva contraseña debe ser distinta.'; return; }
   try {
     await decryptVault(currentVault, currentPassword);
-    const created = await createVault(nextPassword, data);
+    const created = await createVault(nextPassword, buildVaultPayload());
     await putRemoteVault(created.vault, 'seguridad: cambiar contraseña');
     vaultKey = created.key;
     closePasswordModal();
@@ -2765,7 +2738,7 @@ function exportVault() {
   link.download = `manolo-maria-finanzas-${new Date().toISOString().slice(0, 10)}.json`;
   link.click();
   URL.revokeObjectURL(url);
-  showToast('Backup cifrado descargado');
+  showToast('Backup descargado');
 }
 async function importVault(event) {
   document.getElementById('security-menu').open = false;
