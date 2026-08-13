@@ -1,0 +1,20 @@
+{
+  "name": "manolo-maria-finanzas",
+  "version": "0.1.0",
+  "description": "Registra movimientos cifrados en Finanzas · Manolo y María desde ChatGPT.",
+  "author": {
+    "name": "Manolo y María"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Finanzas · Manolo y María",
+    "shortDescription": "Añade movimientos cifrados desde ChatGPT.",
+    "longDescription": "Convierte ingresos y gastos indicados en lenguaje natural en órdenes cifradas para la aplicación Finanzas · Manolo y María.",
+    "developerName": "Manolo y María",
+    "category": "Productivity",
+    "capabilities": ["Write"],
+    "defaultPrompt": [
+      "Añade este movimiento a nuestras finanzas."
+    ]
+  }
+}
