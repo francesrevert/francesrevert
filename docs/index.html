@@ -1310,6 +1310,9 @@ const GITHUB_OWNER = 'francesrevert';
 const GITHUB_REPO = 'francesrevert.github.io';
 const GITHUB_BRANCH = 'data';
 const VAULT_PATH = 'vault.json';
+const CHAT_PUBLIC_KEY_PATH = 'chat-public-key.json';
+const CHAT_INBOX_PATH = 'chat-inbox';
+const CHAT_ENCRYPTION_ALGORITHM = 'RSA-OAEP-256+A256GCM';
 const GITHUB_API_VERSION = '2022-11-28';
 const PBKDF2_ITERATIONS = 600000;
 const LOCK_AFTER_MS = 15 * 60 * 1000;
@@ -1318,6 +1321,9 @@ let vaultKey = null;
 let currentVault = null;
 let githubToken = '';
 let remoteVaultSha = '';
+let chatEncryption = null;
+let processedChatEntryIds = [];
+let chatIntegrationStarted = false;
 let accessMode = 'unlock';
 let lastActivityAt = Date.now();
 const sortState = { ingresos: null, gastos: null, anuales: null };
@@ -1355,6 +1361,13 @@ function bytesToBase64(bytes) {
 }
 function base64ToBytes(value) {
   return Uint8Array.from(atob(value), char => char.charCodeAt(0));
+}
+function bytesToBase64Url(bytes) {
+  return bytesToBase64(bytes).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+}
+function base64UrlToBytes(value) {
+  const normalized = String(value || '').replace(/-/g, '+').replace(/_/g, '/');
+  return base64ToBytes(normalized + '='.repeat((4 - normalized.length % 4) % 4));
 }
 async function deriveVaultKey(password, salt, iterations = PBKDF2_ITERATIONS) {
   const material = await crypto.subtle.importKey('raw', encoder.encode(password), 'PBKDF2', false, ['deriveKey']);
@@ -1411,6 +1424,40 @@ async function putRemoteVault(vault, message) {
   remoteVaultSha = result.content.sha;
   currentVault = vault;
 }
+function githubContentApiUrl(path) {
+  const encodedPath = String(path).split('/').map(encodeURIComponent).join('/');
+  return `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${encodedPath}`;
+}
+async function fetchGithubContent(path) {
+  const response = await fetch(`${githubContentApiUrl(path)}?ref=${encodeURIComponent(GITHUB_BRANCH)}`, {
+    headers: githubHeaders(githubToken), cache: 'no-store'
+  });
+  if (response.status === 404) return null;
+  if (!response.ok) throw new Error('No se ha podido consultar la bandeja compartida.');
+  return response.json();
+}
+async function putGithubJson(path, value, message) {
+  const existing = await fetchGithubContent(path);
+  const content = bytesToBase64(encoder.encode(`${JSON.stringify(value, null, 2)}\n`));
+  const body = { message, content, branch: GITHUB_BRANCH };
+  if (existing?.sha) body.sha = existing.sha;
+  const response = await fetch(githubContentApiUrl(path), {
+    method: 'PUT',
+    headers: { ...githubHeaders(githubToken), 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  if (response.status === 401 || response.status === 403) throw new Error('No se ha podido preparar el acceso desde Chat.');
+  if (!response.ok) throw new Error('No se ha podido preparar el acceso desde Chat.');
+  return response.json();
+}
+async function deleteGithubContent(path, sha) {
+  const response = await fetch(githubContentApiUrl(path), {
+    method: 'DELETE',
+    headers: { ...githubHeaders(githubToken), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message: 'finanzas: retirar movimiento procesado', sha, branch: GITHUB_BRANCH })
+  });
+  if (!response.ok && response.status !== 404) throw new Error('No se ha podido retirar un movimiento procesado.');
+}
 async function decryptVault(vault, password) {
   const salt = base64ToBytes(vault.kdf.salt);
   const key = await deriveVaultKey(password, salt, vault.kdf.iterations);
@@ -1443,7 +1490,13 @@ async function createVault(password, payload, forcePasswordChange = false) {
   };
 }
 function buildVaultPayload() {
-  return { schema: 1, repositoryToken: githubToken, financeData: data };
+  return {
+    schema: 1,
+    repositoryToken: githubToken,
+    financeData: data,
+    chatEncryption,
+    processedChatEntryIds
+  };
 }
 function validateVaultPayload(payload) {
   if (payload?.schema !== 1 || typeof payload.repositoryToken !== 'string' || !payload.repositoryToken.startsWith('github_pat_')) {
@@ -1451,6 +1504,16 @@ function validateVaultPayload(payload) {
   }
   if (!payload.financeData || typeof payload.financeData !== 'object' || Array.isArray(payload.financeData)) {
     throw new Error('La copia cifrada no contiene datos financieros válidos.');
+  }
+  if (payload.chatEncryption != null) {
+    const value = payload.chatEncryption;
+    if (value.version !== 1 || value.algorithm !== CHAT_ENCRYPTION_ALGORITHM || typeof value.keyId !== 'string' || value.keyId.length < 16 ||
+      value.publicKeyJwk?.kty !== 'RSA' || value.privateKeyJwk?.kty !== 'RSA') {
+      throw new Error('La configuración de acceso desde Chat no es válida.');
+    }
+  }
+  if (payload.processedChatEntryIds != null && !Array.isArray(payload.processedChatEntryIds)) {
+    throw new Error('El historial de movimientos de Chat no es válido.');
   }
   return payload;
 }
@@ -1461,6 +1524,257 @@ async function persistEncryptedData() {
     { ...currentVault, ...encrypted, forcePasswordChange: false, updatedAt: new Date().toISOString() },
     `finanzas: actualizar datos ${new Date().toLocaleString('es-ES')}`
   );
+}
+async function createChatEncryption() {
+  const keyPair = await crypto.subtle.generateKey(
+    { name: 'RSA-OAEP', modulusLength: 3072, publicExponent: new Uint8Array([1, 0, 1]), hash: 'SHA-256' },
+    true,
+    ['encrypt', 'decrypt']
+  );
+  const publicKeyJwk = await crypto.subtle.exportKey('jwk', keyPair.publicKey);
+  const privateKeyJwk = await crypto.subtle.exportKey('jwk', keyPair.privateKey);
+  const fingerprintSource = encoder.encode(JSON.stringify({ kty: publicKeyJwk.kty, n: publicKeyJwk.n, e: publicKeyJwk.e }));
+  const fingerprint = new Uint8Array(await crypto.subtle.digest('SHA-256', fingerprintSource));
+  return {
+    version: 1,
+    algorithm: CHAT_ENCRYPTION_ALGORITHM,
+    keyId: bytesToBase64Url(fingerprint),
+    publicKeyJwk,
+    privateKeyJwk
+  };
+}
+function chatPublicKeyFile() {
+  return {
+    version: 1,
+    algorithm: CHAT_ENCRYPTION_ALGORITHM,
+    keyId: chatEncryption.keyId,
+    publicKey: chatEncryption.publicKeyJwk,
+    updatedAt: new Date().toISOString()
+  };
+}
+async function publishChatPublicKey() {
+  const existing = await fetchGithubContent(CHAT_PUBLIC_KEY_PATH);
+  if (existing?.content) {
+    try {
+      const raw = decoder.decode(base64ToBytes(String(existing.content).replace(/\s/g, '')));
+      const parsed = JSON.parse(raw);
+      if (parsed.version === 1 && parsed.algorithm === CHAT_ENCRYPTION_ALGORITHM && parsed.keyId === chatEncryption.keyId) return;
+    } catch { /* Se sustituye una clave pública incompleta. */ }
+  }
+  await putGithubJson(CHAT_PUBLIC_KEY_PATH, chatPublicKeyFile(), 'finanzas: publicar clave de Chat');
+}
+function validChatText(value, maximum, required = false) {
+  const text = String(value || '').trim();
+  if ((required && !text) || text.length > maximum) throw new Error('Movimiento de Chat no válido.');
+  return text;
+}
+function validChatDate(value) {
+  const text = String(value || '');
+  const match = text.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) throw new Error('Movimiento de Chat no válido.');
+  const date = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+  if (date.getFullYear() !== Number(match[1]) || date.getMonth() + 1 !== Number(match[2]) || date.getDate() !== Number(match[3])) {
+    throw new Error('Movimiento de Chat no válido.');
+  }
+  return text;
+}
+function validateChatCommand(command, envelopeId) {
+  if (command?.version !== 1 || command.operation !== 'add_movement' || command.id !== envelopeId) {
+    throw new Error('Movimiento de Chat no válido.');
+  }
+  const movement = command.movement || {};
+  const kind = String(movement.kind || '');
+  const recurrence = String(movement.recurrence || '');
+  const status = String(movement.status || 'planned');
+  if (!['income', 'expense'].includes(kind) || !['once', 'monthly', 'annual', 'installments'].includes(recurrence) || !['planned', 'paid'].includes(status)) {
+    throw new Error('Movimiento de Chat no válido.');
+  }
+  if (kind === 'income' && ['annual', 'installments'].includes(recurrence)) throw new Error('Movimiento de Chat no válido.');
+  const amount = roundMoney(Number(movement.amount));
+  if (!Number.isFinite(amount) || amount <= 0 || amount > 100000000) throw new Error('Movimiento de Chat no válido.');
+  const normalized = {
+    kind,
+    name: validChatText(movement.name, 160, true),
+    amount,
+    date: validChatDate(movement.date),
+    recurrence,
+    status,
+    notes: validChatText(movement.notes, 2000),
+    category: validChatText(movement.category, 120)
+  };
+  if (recurrence === 'installments') {
+    const installments = Number(movement.installments);
+    if (!Number.isInteger(installments) || installments < 2 || installments > 36) throw new Error('Movimiento de Chat no válido.');
+    normalized.installments = installments;
+    if (movement.finalAmount != null) {
+      const finalAmount = roundMoney(Number(movement.finalAmount));
+      if (!Number.isFinite(finalAmount) || finalAmount <= 0 || finalAmount > 100000000) throw new Error('Movimiento de Chat no válido.');
+      normalized.finalAmount = finalAmount;
+    }
+  }
+  return { ...command, movement: normalized };
+}
+async function decryptChatEnvelope(envelope) {
+  if (envelope?.version !== 1 || envelope.algorithm !== CHAT_ENCRYPTION_ALGORITHM || envelope.keyId !== chatEncryption.keyId ||
+    typeof envelope.id !== 'string' || !/^[0-9a-f-]{36}$/i.test(envelope.id)) {
+    throw new Error('Movimiento cifrado no compatible.');
+  }
+  const privateKey = await crypto.subtle.importKey(
+    'jwk', chatEncryption.privateKeyJwk,
+    { name: 'RSA-OAEP', hash: 'SHA-256' }, false, ['decrypt']
+  );
+  const aesKeyBytes = await crypto.subtle.decrypt(
+    { name: 'RSA-OAEP' }, privateKey, base64UrlToBytes(envelope.wrappedKey)
+  );
+  const aesKey = await crypto.subtle.importKey('raw', aesKeyBytes, { name: 'AES-GCM' }, false, ['decrypt']);
+  const additionalData = encoder.encode(`manolo-maria-finanzas:${envelope.id}:${envelope.keyId}`);
+  const plaintext = await crypto.subtle.decrypt(
+    { name: 'AES-GCM', iv: base64UrlToBytes(envelope.iv), additionalData },
+    aesKey,
+    base64UrlToBytes(envelope.ciphertext)
+  );
+  return validateChatCommand(JSON.parse(decoder.decode(plaintext)), envelope.id);
+}
+function chatMovementAlreadyExists(targetData, commandId) {
+  return ['programados', 'ingresos', 'gastos', 'sinSuscripcion', 'anuales'].some(section =>
+    (targetData[section] || []).some(row => row.chatSourceId === commandId)
+  );
+}
+function applyChatMovement(targetData, command) {
+  if (chatMovementAlreadyExists(targetData, command.id)) return false;
+  const movement = command.movement;
+  const paid = movement.status === 'paid';
+  const monthKey = movement.date.slice(0, 7);
+  const day = Number(movement.date.slice(-2));
+  const base = {
+    id: `chat-${command.id}`,
+    chatSourceId: command.id,
+    elemento: movement.name,
+    importe: movement.amount,
+    observaciones: movement.notes,
+    color: null
+  };
+
+  if (movement.kind === 'income') {
+    const row = {
+      ...base,
+      frecuencia: movement.recurrence === 'monthly' ? 'Mensual' : 'Único',
+      dia: day,
+      categoria: movement.category || (movement.recurrence === 'monthly' ? 'Ingreso' : 'Ingreso extraordinario')
+    };
+    if (movement.recurrence === 'monthly') {
+      row.fechaInicio = movement.date;
+      if (paid) row.historialMensual = { [monthKey]: { fecha: movement.date, importe: movement.amount, estado: 'cobrado' } };
+    } else {
+      row.fechaIngreso = movement.date;
+      row.estado = paid ? 'cobrado' : 'previsto';
+    }
+    targetData.ingresos.push(row);
+    return true;
+  }
+
+  if (movement.recurrence === 'monthly') {
+    targetData.gastos.push({
+      ...base,
+      frecuencia: 'Mensual',
+      dia: day,
+      fechaInicio: movement.date,
+      categoria: movement.category || 'Gasto fijo',
+      pendienteRenovacion: false,
+      historialFacturas: paid ? [{ fecha: movement.date, importe: movement.amount, estado: 'cobrado' }] : []
+    });
+    return true;
+  }
+  if (movement.recurrence === 'annual') {
+    targetData.anuales.push({
+      ...base,
+      frecuencia: 'Anual',
+      dia: day,
+      fechaInicio: movement.date,
+      mesesDeCargo: [Number(movement.date.slice(5, 7))],
+      categoria: movement.category || 'Suscripción',
+      pendienteRenovacion: false,
+      historialFacturas: paid ? [{ fecha: movement.date, importe: movement.amount, estado: 'cobrado' }] : []
+    });
+    return true;
+  }
+
+  const installments = movement.recurrence === 'installments' ? movement.installments : 1;
+  const row = {
+    ...base,
+    frecuencia: installments > 1 ? `${installments} cuotas mensuales` : 'Único',
+    dia: day,
+    fechaInicio: movement.date,
+    tipoProgramacion: installments > 1 ? 'cuotas' : 'unico',
+    numeroCuotas: installments,
+    categoria: movement.category || (installments > 1 ? 'Compra a plazos' : 'Gasto extraordinario'),
+    historialFacturas: paid ? [{ fecha: movement.date, importe: movement.amount, estado: 'cobrado' }] : []
+  };
+  if (movement.finalAmount != null) row.importeCuotaFinal = movement.finalAmount;
+  targetData.programados.push(row);
+  return true;
+}
+async function processChatInbox() {
+  const listing = await fetchGithubContent(CHAT_INBOX_PATH);
+  if (!Array.isArray(listing)) return;
+  const files = listing.filter(item => item?.type === 'file' && item.name?.endsWith('.json')).slice(0, 100);
+  if (!files.length) return;
+  const nextData = JSON.parse(JSON.stringify(data));
+  const processed = new Set(processedChatEntryIds);
+  const removable = [];
+  let imported = 0;
+  let failed = 0;
+
+  for (const file of files) {
+    const idFromName = file.name.replace(/\.json$/i, '');
+    if (processed.has(idFromName)) {
+      removable.push(file);
+      continue;
+    }
+    try {
+      const stored = await fetchGithubContent(`${CHAT_INBOX_PATH}/${file.name}`);
+      const raw = decoder.decode(base64ToBytes(String(stored?.content || '').replace(/\s/g, '')));
+      const command = await decryptChatEnvelope(JSON.parse(raw));
+      if (applyChatMovement(nextData, command)) imported += 1;
+      processed.add(command.id);
+      removable.push(file);
+    } catch (error) {
+      failed += 1;
+      console.warn('No se ha podido importar un movimiento de Chat.', error);
+    }
+  }
+
+  if (removable.length) {
+    const previousData = data;
+    const previousProcessed = processedChatEntryIds;
+    data = nextData;
+    processedChatEntryIds = Array.from(processed).slice(-500);
+    try {
+      await persistEncryptedData();
+      renderAll();
+      await Promise.allSettled(removable.map(file => deleteGithubContent(`${CHAT_INBOX_PATH}/${file.name}`, file.sha)));
+    } catch (error) {
+      data = previousData;
+      processedChatEntryIds = previousProcessed;
+      throw error;
+    }
+  }
+  if (imported) showToast(`${imported} movimiento${imported === 1 ? '' : 's'} importado${imported === 1 ? '' : 's'}`);
+  else if (failed) showToast('Hay un movimiento pendiente que no se ha podido importar');
+}
+async function initializeChatIntegration() {
+  if (chatIntegrationStarted) return;
+  chatIntegrationStarted = true;
+  try {
+    if (!chatEncryption) {
+      chatEncryption = await createChatEncryption();
+      await persistEncryptedData();
+    }
+    await publishChatPublicKey();
+    await processChatInbox();
+  } catch (error) {
+    console.error(error);
+  }
 }
 function setAccessBusy(busy) {
   const button = document.getElementById('access-submit');
@@ -1494,6 +1808,7 @@ async function handleAccess(event) {
       const confirmation = document.getElementById('confirm-password').value;
       const validation = validateNewPassword(password, confirmation);
       if (validation) throw new Error(validation);
+      if (!chatEncryption) chatEncryption = await createChatEncryption();
       const created = await createVault(password, buildVaultPayload());
       await putRemoteVault(created.vault, 'seguridad: sustituir contraseña temporal');
       vaultKey = created.key;
@@ -1512,6 +1827,10 @@ async function handleAccess(event) {
     currentVault = remote.vault;
     vaultKey = unlocked.key;
     data = payload.financeData;
+    chatEncryption = payload.chatEncryption || null;
+    processedChatEntryIds = Array.isArray(payload.processedChatEntryIds)
+      ? payload.processedChatEntryIds.filter(id => typeof id === 'string').slice(-500)
+      : [];
     if (currentVault.forcePasswordChange) { showBootstrapChange(); return; }
     openApp();
   } catch (error) {
@@ -1529,6 +1848,7 @@ function openApp() {
   document.getElementById('access-screen').style.display = 'none';
   document.getElementById('app').style.display = 'block';
   lastActivityAt = Date.now();
+  setTimeout(() => initializeChatIntegration(), 0);
 }
 function lockApp() {
   data = null;
@@ -1536,6 +1856,9 @@ function lockApp() {
   currentVault = null;
   githubToken = '';
   remoteVaultSha = '';
+  chatEncryption = null;
+  processedChatEntryIds = [];
+  chatIntegrationStarted = false;
   location.reload();
 }
 function initAccess() {

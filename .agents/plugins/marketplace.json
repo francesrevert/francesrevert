@@ -1,0 +1,20 @@
+{
+  "name": "manolo-maria-finanzas",
+  "interface": {
+    "displayName": "Finanzas · Manolo y María"
+  },
+  "plugins": [
+    {
+      "name": "manolo-maria-finanzas",
+      "source": {
+        "source": "local",
+        "path": "./plugins/manolo-maria-finanzas"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}
