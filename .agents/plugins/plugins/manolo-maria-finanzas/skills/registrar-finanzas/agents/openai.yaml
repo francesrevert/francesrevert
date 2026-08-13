@@ -1,0 +1,4 @@
+interface:
+  display_name: "Registrar finanzas"
+  short_description: "Añade movimientos cifrados desde ChatGPT"
+  default_prompt: "Usa $registrar-finanzas para añadir este movimiento a nuestras finanzas."
