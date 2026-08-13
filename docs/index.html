@@ -4,12 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src https://api.github.com; font-src 'none'; object-src 'none'; media-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'; manifest-src 'self';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; img-src data:; connect-src https://api.github.com; font-src https://fonts.gstatic.com; object-src 'none'; media-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'; manifest-src 'self';">
 <title>Finanzas — Manolo y María</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --display: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
-  --body: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --display: 'Bebas Neue', sans-serif;
+  --body: 'DM Sans', sans-serif;
   --blue: #275dff;
   --blue-dark: #1544d9;
   --header-bg: rgba(247, 247, 247, .9);
@@ -862,8 +865,15 @@ td.td-del { padding-block: 11px !important; }
   .month-finance-item + .month-finance-item { border-left: none; border-top: 1px solid var(--border); }
   .month-controls { width: 100%; }
   .month-picker { flex: 1; min-width: 0; }
-  .month-row { grid-template-columns: minmax(0, 1fr) 100px; gap: 8px 10px; padding: 10px; }
-  .month-date-input { grid-column: 1; grid-row: 2; }
+  .month-row { grid-template-columns: minmax(0, 1fr) 92px; gap: 8px; padding: 10px; }
+  .month-date-input {
+    grid-column: 1;
+    grid-row: 2;
+    width: 100%;
+    max-width: 148px;
+    min-width: 0;
+    padding-inline: 4px;
+  }
   .month-movement { grid-column: 1 / -1; grid-row: 1; }
   .month-status-select { grid-column: 2; grid-row: 2; }
   .month-amount { grid-column: 2; grid-row: 1; }
@@ -900,7 +910,7 @@ td.td-del { padding-block: 11px !important; }
   #table-sinSuscripcion tr,
   #table-anuales tr {
     display: grid;
-    grid-template-columns: 36px minmax(0, 1fr) auto;
+    grid-template-columns: 36px auto minmax(0, 1fr) 48px;
     gap: 6px 10px;
     align-items: center;
     border: 1px solid var(--border);
@@ -919,12 +929,12 @@ td.td-del { padding-block: 11px !important; }
   #table-ingresos .td-el,
   #table-gastos .td-el,
   #table-sinSuscripcion .td-el,
-  #table-anuales .td-el { grid-column: 2; grid-row: 1; min-width: 0; }
+  #table-anuales .td-el { grid-column: 2 / 4; grid-row: 1; min-width: 0; }
   #table-programados .td-imp,
   #table-ingresos .td-imp,
   #table-gastos .td-imp,
   #table-sinSuscripcion .td-imp,
-  #table-anuales .td-imp { grid-column: 3; grid-row: 1; padding-right: 12px !important; }
+  #table-anuales .td-imp { grid-column: 4; grid-row: 1; padding-right: 12px !important; }
   #table-programados .td-meta,
   #table-ingresos .td-meta,
   #table-gastos .td-meta,
@@ -945,17 +955,17 @@ td.td-del { padding-block: 11px !important; }
   #table-anuales .td-meta:nth-of-type(5) { grid-row: 2; }
   #table-gastos .td-renewal,
   #table-sinSuscripcion .td-renewal,
-  #table-anuales .td-renewal { grid-column: 2 / -1; grid-row: 4; padding: 4px 12px !important; }
-  #table-programados .td-obs { grid-column: 2; grid-row: 4; padding: 8px 12px !important; }
-  #table-ingresos .td-obs { grid-column: 2; grid-row: 3; padding: 8px 12px !important; }
+  #table-anuales .td-renewal { grid-column: 2; grid-row: 4; width: auto; padding: 8px 0 8px 12px !important; }
+  #table-programados .td-obs { grid-column: 2 / 4; grid-row: 4; padding: 8px 12px !important; }
+  #table-ingresos .td-obs { grid-column: 2 / 4; grid-row: 3; padding: 8px 12px !important; }
   #table-gastos .td-obs,
   #table-sinSuscripcion .td-obs,
-  #table-anuales .td-obs { grid-column: 2; grid-row: 5; padding: 8px 12px !important; }
-  #table-programados .td-del { grid-column: 3; grid-row: 4; }
-  #table-ingresos .td-del { grid-column: 3; grid-row: 3; }
+  #table-anuales .td-obs { grid-column: 3; grid-row: 4; width: auto; padding: 8px 4px !important; text-align: left; }
+  #table-programados .td-del { grid-column: 4; grid-row: 4; }
+  #table-ingresos .td-del { grid-column: 4; grid-row: 3; }
   #table-gastos .td-del,
   #table-sinSuscripcion .td-del,
-  #table-anuales .td-del { grid-column: 3; grid-row: 5; }
+  #table-anuales .td-del { grid-column: 4; grid-row: 4; }
   #table-programados .td-del,
   #table-ingresos .td-del,
   #table-gastos .td-del,
