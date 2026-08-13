@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "cipher": "AES-GCM",
+  "kdf": {
+    "name": "PBKDF2-SHA256",
+    "iterations": 600000,
+    "salt": "sKNrLoqTVjNYFYAs2dwsWA=="
+  },
+  "iv": "ZX2espmJm1f8ek4/",
+  "ciphertext": "gKPXqCVQCBCT05mWxHd3tEyP1wfj0oK5L/u8JCE2ZumCvS+rMauHlWd7QLvGGoKuBk9xcTlcoA7HIirvJ1Or8H0USypsYjBzRP4xakdR/6+h++TAn1FtRGMdGRSg1FQ9oLIUZUSjuUgG+i/U6kowrsptupHkYSAHPy0=",
+  "forcePasswordChange": true,
+  "updatedAt": "2026-08-13T04:26:31.374Z"
+}
