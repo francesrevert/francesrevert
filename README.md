@@ -18,29 +18,31 @@ mes, saldos, estados, fechas, notas, colores y totales.
   copia cifrada se guarda en GitHub y la clave temporal deja de descifrarla en todos los
   dispositivos.
 
-La aplicación publicada es accesible por Internet. En una cuenta personal, GitHub Pages no
-ofrece acceso privado salvo planes y modalidades concretas; la confidencialidad depende del
-cifrado del vault y de una contraseña larga y exclusiva.
+La aplicación y el repositorio son públicos. Cualquiera puede descargar el archivo cifrado,
+pero no leer su contenido sin la contraseña. La confidencialidad depende del cifrado, de una
+contraseña larga y exclusiva y de la seguridad de la cuenta de GitHub.
 
 ## Token de acceso por persona
 
-Manolo y María deben usar cuentas propias de GitHub con acceso al repositorio y crear cada
-uno un token personal de granularidad fina:
+La persona que gestiona el repositorio debe crear desde la cuenta `francesrevert` un token
+personal de granularidad fina:
 
 1. Abrir `https://github.com/settings/personal-access-tokens/new`.
 2. Elegir como propietario del recurso `francesrevert`.
 3. Limitar el token exclusivamente al repositorio `francesrevert`.
 4. Conceder `Repository permissions → Contents → Read and write`.
-5. Definir una fecha de caducidad y renovar el token cuando corresponda.
+5. Definir una fecha de caducidad corta y renovarlo cuando corresponda.
 
 El token se introduce al abrir la web. No debe guardarse en notas, commits ni conversaciones.
 
 ## Publicación
 
 El workflow de GitHub Actions publica solo la carpeta `docs/`. El archivo cifrado `vault.json`
-permanece fuera del artefacto web y se lee mediante la API autenticada de GitHub.
+permanece fuera del artefacto de Pages; la aplicación exige autenticación para leerlo y
+actualizarlo mediante la API de GitHub.
 
-En `Settings → Pages`, la fuente de publicación debe ser **GitHub Actions**.
+La fuente de publicación de `Settings → Pages` está configurada como **GitHub Actions**. La
+dirección prevista es `https://francesrevert.github.io/francesrevert/`.
 
 ## Cambios mediante ChatGPT + GitHub
 

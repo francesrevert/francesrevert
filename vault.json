@@ -4,10 +4,10 @@
   "kdf": {
     "name": "PBKDF2-SHA256",
     "iterations": 600000,
-    "salt": "sKNrLoqTVjNYFYAs2dwsWA=="
+    "salt": "41Ddjuq6FPBZmMmK4i8P/w=="
   },
-  "iv": "ZX2espmJm1f8ek4/",
-  "ciphertext": "gKPXqCVQCBCT05mWxHd3tEyP1wfj0oK5L/u8JCE2ZumCvS+rMauHlWd7QLvGGoKuBk9xcTlcoA7HIirvJ1Or8H0USypsYjBzRP4xakdR/6+h++TAn1FtRGMdGRSg1FQ9oLIUZUSjuUgG+i/U6kowrsptupHkYSAHPy0=",
+  "iv": "i7GbxrCkEXERk6m+",
+  "ciphertext": "LpLWCwp49LCCHo2hsyN4pBmPiOw3LwyLq40BV39yuwxoIx1s49wzKtHM+9iWr4mpRUxBl6zwJ2un8rBNBXfn5zkqnnunB+vg6nBoqcHlYtD5EGfUgFwesKyUQcpHhqTDozfh+lBQVuHA3m32CeSSg0f/MVkRlunYemnP6FE2u0xOtcl79letsVBL1yW8BapWKKNxZLyo7lub9iqj3etJdecTMd+IgiBAWw==",
   "forcePasswordChange": true,
-  "updatedAt": "2026-08-13T04:26:31.374Z"
+  "updatedAt": "2026-08-13T04:47:22.007Z"
 }
