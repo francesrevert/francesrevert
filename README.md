@@ -8,9 +8,11 @@ mes, saldos, estados, fechas, notas, colores y totales.
 
 - Los datos se cifran en cada navegador con AES-256-GCM.
 - La clave se deriva de la contraseña con PBKDF2-SHA256 y 600.000 iteraciones.
-- GitHub solo recibe `vault.json`, cuyo contenido financiero es ilegible sin la contraseña.
+- GitHub solo recibe `vault.json`, cuyo contenido financiero y credencial de guardado son
+  ilegibles sin la contraseña.
 - La contraseña nunca se envía a GitHub.
-- El token de GitHub se conserva únicamente en memoria mientras la pestaña está abierta.
+- La credencial de GitHub permanece cifrada dentro del vault y solo existe en memoria
+  mientras la sesión está abierta.
 - La sesión se bloquea tras 15 minutos sin actividad.
 - Cada guardado incluye el SHA leído al abrir la aplicación. Si otra persona ha guardado
   antes, GitHub devuelve un conflicto y se evita sobrescribir sus cambios.
@@ -22,24 +24,22 @@ La aplicación y el repositorio son públicos. Cualquiera puede descargar el arc
 pero no leer su contenido sin la contraseña. La confidencialidad depende del cifrado, de una
 contraseña larga y exclusiva y de la seguridad de la cuenta de GitHub.
 
-## Token de acceso por persona
+## Acceso cotidiano
 
-La persona que gestiona el repositorio debe crear desde la cuenta `francesrevert` un token
-personal de granularidad fina:
+Manolo y María solo tienen que introducir la contraseña. La aplicación descarga la copia
+cifrada públicamente, la descifra en el navegador y utiliza internamente la credencial
+incluida para guardar. La primera contraseña es temporal y obliga a crear una frase nueva de
+al menos 16 caracteres.
 
-1. Abrir `https://github.com/settings/personal-access-tokens/new`.
-2. Elegir como propietario del recurso `francesrevert`.
-3. Limitar el token exclusivamente al repositorio `francesrevert`.
-4. Conceder `Repository permissions → Contents → Read and write`.
-5. Definir una fecha de caducidad corta y renovarlo cuando corresponda.
-
-El token se introduce al abrir la web. No debe guardarse en notas, commits ni conversaciones.
+La credencial está limitada a este repositorio, solo concede `Contents: read and write` y
+caduca el 13 de agosto de 2027. Su renovación es una tarea de mantenimiento; nunca debe
+facilitarse al usuario final ni guardarse en texto claro.
 
 ## Publicación
 
-El workflow de GitHub Actions publica solo la carpeta `docs/`. El archivo cifrado `vault.json`
-permanece fuera del artefacto de Pages; la aplicación exige autenticación para leerlo y
-actualizarlo mediante la API de GitHub.
+El workflow de GitHub Actions publica solo la carpeta `docs/` de `main`. El archivo cifrado
+`vault.json` vive en la rama `data`, fuera del artefacto de Pages. Se lee sin autenticación y
+solo puede actualizarse después de descifrar la credencial incluida.
 
 La fuente de publicación de `Settings → Pages` está configurada como **GitHub Actions**. La
 dirección prevista es `https://francesrevert.github.io/francesrevert/`.
