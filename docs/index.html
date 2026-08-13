@@ -1,0 +1,1911 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src https://api.github.com; font-src 'none'; object-src 'none'; media-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'; manifest-src 'self';">
+<title>Finanzas · Manolo y María</title>
+<style>
+:root {
+  --display: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+  --body: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+[data-theme="light"] {
+  --bg:         #ffffff;
+  --bg2:        #f5f5f5;
+  --surface:    #ffffff;
+  --surface2:   #eeeeee;
+  --border:     #e4e4e4;
+  --border2:    #cccccc;
+  --text:       #111111;
+  --text-dim:   #444444;
+  --text-muted: #888888;
+  --green:      #1a6b3a;
+  --red:        #c0392b;
+}
+[data-theme="dark"] {
+  --bg:         #111111;
+  --bg2:        #191919;
+  --surface:    #191919;
+  --surface2:   #232323;
+  --border:     #2c2c2c;
+  --border2:    #3a3a3a;
+  --text:       #eeeeee;
+  --text-dim:   #aaaaaa;
+  --text-muted: #666666;
+  --green:      #4ade80;
+  --red:        #f87171;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--body);
+  font-size: 14px;
+  line-height: 1.5;
+  min-height: 100vh;
+  transition: background .2s, color .2s;
+}
+
+/* ── APP ───────────────────────────────────────────── */
+#app { display: none; }
+
+/* ── HEADER ────────────────────────────────────────── */
+header {
+  height: 50px;
+  padding: 0 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  position: sticky;
+  top: 0;
+  z-index: 200;
+}
+.h-left  { display: flex; align-items: center; gap: 14px; }
+.h-right { display: flex; align-items: center; gap: 8px; }
+
+.h-logo {
+  font-family: var(--display);
+  font-size: 20px;
+  letter-spacing: .06em;
+  color: var(--text);
+}
+.h-logo span { color: var(--text-muted); font-size: 16px; }
+
+.h-sep { width: 1px; height: 16px; background: var(--border2); }
+.h-date { font-size: 12px; color: var(--text-muted); font-style: italic; }
+
+.hbtn {
+  background: none;
+  border: 1px solid var(--border2);
+  color: var(--text-dim);
+  padding: 5px 12px;
+  font-family: var(--body);
+  font-size: 11px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color .15s, color .15s;
+  display: flex; align-items: center; gap: 6px;
+  white-space: nowrap;
+}
+.hbtn:hover  { border-color: var(--text-dim); color: var(--text); }
+.hbtn.ok     { border-color: var(--green); color: var(--green); }
+
+.hbtn-sq {
+  background: none;
+  border: 1px solid var(--border2);
+  color: var(--text-dim);
+  width: 30px; height: 30px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: border-color .15s, color .15s;
+}
+.hbtn-sq:hover { border-color: var(--text-dim); color: var(--text); }
+
+.hbtn-ghost {
+  background: none; border: none;
+  color: var(--text-muted);
+  font-family: var(--body);
+  font-size: 11px; letter-spacing: .06em; text-transform: uppercase;
+  cursor: pointer; padding: 5px 4px;
+  transition: color .15s;
+}
+.hbtn-ghost:hover { color: var(--text); }
+
+/* ── KPI BAR ───────────────────────────────────────── */
+.kpi-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+.kpi-item {
+  padding: 16px 28px;
+  border-right: 1px solid var(--border);
+}
+.kpi-item:last-child { border-right: none; }
+.kpi-label {
+  font-size: 10px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+.kpi-val {
+  font-family: var(--display);
+  font-size: 28px;
+  letter-spacing: .02em;
+  color: var(--text);
+  line-height: 1.1;
+}
+.kpi-val.income  { color: var(--green); }
+.kpi-val.expense { color: var(--red); }
+.kpi-val.pos     { color: var(--green); }
+.kpi-val.neg     { color: var(--red); }
+
+/* ── MONTH VIEW ────────────────────────────────────── */
+.month-section {
+  margin-bottom: 34px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+.month-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg2);
+}
+.month-title-wrap { min-width: 0; }
+.month-title {
+  font-family: var(--display);
+  font-size: 20px;
+  letter-spacing: .05em;
+}
+.month-subtitle {
+  color: var(--text-muted);
+  font-size: 11px;
+  margin-top: 1px;
+}
+.month-controls { display: flex; align-items: center; gap: 6px; }
+.month-nav {
+  width: 30px; height: 30px;
+  border: 1px solid var(--border2);
+  background: var(--surface);
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+}
+.month-nav:hover { border-color: var(--text-dim); color: var(--text); }
+.month-nav:disabled { opacity: .35; cursor: not-allowed; border-color: var(--border); color: var(--text-muted); }
+.month-picker {
+  height: 30px;
+  border: 1px solid var(--border2);
+  background: var(--surface);
+  color: var(--text);
+  font: 12px var(--body);
+  padding: 0 8px;
+}
+.month-finance {
+  display: block;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+.month-finance-item { padding: 12px 14px; }
+.month-finance-label {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--text-muted);
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.month-opening-input {
+  width: 100%;
+  max-width: 220px;
+  height: 32px;
+  border: 1px solid var(--border2);
+  background: var(--surface);
+  color: var(--text);
+  padding: 0 8px;
+  font: 13px var(--body);
+}
+.month-opening-input:focus { outline: 1px solid var(--text-muted); outline-offset: -1px; }
+.monthly-ledger { width: 100%; }
+.month-row {
+  display: grid;
+  grid-template-columns: 132px minmax(0, 1fr) 104px auto;
+  gap: 14px;
+  align-items: center;
+  min-height: 48px;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--border);
+}
+.month-row:last-child { border-bottom: none; }
+.month-row:hover { background: var(--bg2); }
+.month-day {
+  color: var(--text-muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+.month-movement { min-width: 0; }
+.month-movement-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.month-dot {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+  border: 1px solid var(--border2);
+}
+.month-name { font-size: 13px; font-weight: 500; }
+.month-meta { color: var(--text-muted); font-size: 11px; margin-top: 1px; }
+.month-date-input,
+.month-status-select {
+  width: 100%;
+  height: 30px;
+  border: 1px solid var(--border2);
+  background: var(--surface);
+  color: var(--text);
+  font: 11px var(--body);
+  padding: 0 7px;
+}
+.month-date-input:focus,
+.month-status-select:focus { outline: 1px solid var(--text-muted); outline-offset: -1px; }
+.month-date-input:disabled { color: var(--text-muted); opacity: .65; }
+.month-status-select.status-paid { color: var(--green); border-color: var(--green); }
+.month-status-select.status-planned { color: var(--text-muted); }
+.month-amount {
+  font-family: var(--display);
+  font-size: 18px;
+  letter-spacing: .02em;
+  white-space: nowrap;
+}
+.month-row.income .month-amount { color: var(--green); }
+.month-row.expense .month-amount { color: var(--red); }
+.month-empty {
+  padding: 24px 14px;
+  color: var(--text-muted);
+  font-size: 12px;
+  text-align: center;
+}
+
+/* ── CONTENT ───────────────────────────────────────── */
+.content { padding: 28px; max-width: 1080px; }
+.section { margin-bottom: 40px; overflow-x: auto; overscroll-behavior-inline: contain; }
+.section-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding-bottom: 10px;
+}
+.section-title {
+  font-family: var(--display);
+  font-size: 18px;
+  letter-spacing: .06em;
+  color: var(--text);
+}
+.add-btn {
+  background: none; border: none;
+  color: var(--text-muted);
+  font-family: var(--body);
+  font-size: 11px; letter-spacing: .06em; text-transform: uppercase;
+  cursor: pointer; transition: color .15s;
+  display: flex; align-items: center; gap: 4px; padding: 0;
+}
+.add-btn:hover { color: var(--text); }
+
+/* ── TABLE ─────────────────────────────────────────── */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid var(--border);
+}
+thead th {
+  background: var(--bg2);
+  padding: 8px 14px;
+  text-align: left;
+  font-family: var(--body);
+  font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+  font-weight: 400;
+  white-space: nowrap;
+  user-select: none;
+}
+th.sortable { cursor: pointer; }
+th.sortable:hover { color: var(--text-dim); }
+th.th-r  { text-align: right; }
+th.th-xs { width: 36px; padding: 8px; }
+th.th-color { width: 36px; padding: 8px; }
+
+tbody tr { border-bottom: 1px solid var(--border); transition: background .1s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--bg2); }
+tbody tr.dragging { opacity: .35; }
+tbody tr.drop-top td { box-shadow: inset 0 2px 0 var(--text-dim); }
+tbody tr.drop-bot td { box-shadow: inset 0 -2px 0 var(--text-dim); }
+
+td { padding: 0; vertical-align: middle; }
+
+/* drag handle */
+.td-handle {
+  width: 32px; padding: 0 8px !important;
+  text-align: center; cursor: grab;
+  color: var(--border2); transition: color .15s;
+}
+.td-handle:hover { color: var(--text-muted); }
+.td-handle:active { cursor: grabbing; }
+
+/* colour dot */
+.td-color { width: 36px; padding: 0 10px !important; text-align: center; }
+
+.color-dot-wrap { position: relative; display: inline-flex; align-items: center; justify-content: center; }
+
+.color-dot {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border2);
+  cursor: pointer;
+  display: block;
+  transition: transform .15s;
+  flex-shrink: 0;
+}
+.color-dot:hover { transform: scale(1.25); }
+
+/* native color picker hidden behind dot */
+.color-picker-input {
+  position: absolute;
+  width: 0; height: 0;
+  opacity: 0;
+  pointer-events: none;
+  border: none;
+  padding: 0;
+}
+
+/* editable cells */
+td.td-el, td.td-imp, td.td-meta, td.td-obs, td.td-renewal, td.td-del { padding: 8px 14px !important; }
+
+.editable {
+  outline: none;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  padding: 3px 5px; margin: -3px -5px;
+  min-width: 10px;
+  display: inline-block;
+  cursor: text;
+  transition: border-color .12s, background .12s;
+}
+.editable:hover  { border-color: var(--border2); background: var(--surface2); }
+.editable:focus  { border-color: var(--border2); background: var(--surface); outline: none; }
+
+.td-el .editable { font-weight: 500; font-size: 13px; }
+.td-imp { text-align: right; font-size: 13px; white-space: nowrap; }
+.td-imp .editable { font-size: 13px; text-align: right; min-width: 50px; }
+.td-obs { width: 84px; text-align: center; }
+.td-renewal { width: 158px; }
+.td-meta { color: var(--text-dim); font-size: 12px; white-space: nowrap; }
+.td-meta .editable { font-size: 12px; min-width: 42px; }
+
+.notes-btn,
+.renewal-toggle {
+  border: 1px solid var(--border2);
+  background: var(--surface);
+  color: var(--text-dim);
+  min-height: 28px;
+  padding: 4px 9px;
+  font: 11px var(--body);
+  cursor: pointer;
+  transition: border-color .15s, color .15s, background .15s;
+  white-space: nowrap;
+}
+.notes-btn:hover,
+.renewal-toggle:hover { border-color: var(--text-dim); color: var(--text); }
+.notes-btn.has-notes { color: var(--text); }
+.renewal-toggle.pending {
+  border-color: var(--red);
+  color: var(--red);
+  background: color-mix(in srgb, var(--red) 8%, var(--surface));
+}
+tr.pending-renewal td:not(.td-del) { opacity: .58; }
+tr.pending-renewal .notes-btn,
+tr.pending-renewal .renewal-toggle { opacity: 1; }
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(0,0,0,.55);
+}
+.modal-backdrop[hidden] { display: none; }
+.modal-card {
+  width: min(560px, 100%);
+  max-height: calc(100vh - 40px);
+  overflow: auto;
+  border: 1px solid var(--border2);
+  background: var(--surface);
+  box-shadow: 0 18px 60px rgba(0,0,0,.3);
+}
+.modal-head,
+.modal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+}
+.modal-head { border-bottom: 1px solid var(--border); }
+.modal-actions { justify-content: flex-end; border-top: 1px solid var(--border); }
+.modal-title {
+  font-family: var(--display);
+  font-size: 20px;
+  letter-spacing: .05em;
+}
+.modal-close {
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+}
+.modal-body { padding: 16px; }
+.modal-label {
+  display: block;
+  margin-bottom: 7px;
+  color: var(--text-muted);
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.modal-textarea {
+  display: block;
+  width: 100%;
+  min-height: 180px;
+  resize: vertical;
+  border: 1px solid var(--border2);
+  background: var(--bg);
+  color: var(--text);
+  padding: 11px;
+  font: 13px/1.5 var(--body);
+}
+.modal-textarea:focus { outline: 1px solid var(--text-muted); outline-offset: -1px; }
+.modal-btn {
+  border: 1px solid var(--border2);
+  background: var(--surface);
+  color: var(--text);
+  padding: 7px 12px;
+  font: 11px var(--body);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  cursor: pointer;
+}
+.modal-btn.primary { border-color: var(--text); background: var(--text); color: var(--bg); }
+
+.td-del { width: 36px; text-align: center; padding: 0 8px !important; }
+.del-btn {
+  background: none; border: none;
+  color: var(--border2); cursor: pointer;
+  padding: 3px; transition: color .15s;
+  opacity: 0; display: flex; align-items: center; justify-content: center; margin: auto;
+}
+tr:hover .del-btn { opacity: 1; }
+.del-btn:hover { color: var(--red); }
+
+.sort-arrow { margin-left: 3px; font-size: 9px; }
+
+/* ── TABLE FOOTER ──────────────────────────────────── */
+.tfoot {
+  display: flex; justify-content: flex-end; align-items: center;
+  padding: 8px 14px;
+  border: 1px solid var(--border); border-top: none;
+  background: var(--bg2); gap: 10px;
+}
+.tfoot-label { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--text-muted); }
+.tfoot-val { font-family: var(--display); font-size: 16px; letter-spacing: .03em; color: var(--text); }
+.upcoming { border: 1px solid var(--border); }
+.upcoming-row { display: grid; grid-template-columns: 74px 1fr auto; gap: 12px; align-items: center; padding: 9px 14px; border-bottom: 1px solid var(--border); font-size: 12px; }
+.upcoming-row:last-child { border-bottom: none; }
+.upcoming-day { color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
+.upcoming-meta { color: var(--text-muted); font-size: 11px; }
+
+/* ── HINT ──────────────────────────────────────────── */
+.hint-bar {
+  margin-top: 40px; padding: 14px 18px;
+  border: 1px solid var(--border); background: var(--bg2);
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+}
+.hint-text { font-size: 12px; color: var(--text-muted); }
+.hint-text code {
+  font-size: 11px; background: var(--surface2); padding: 1px 5px;
+  border: 1px solid var(--border);
+}
+
+/* ── TOAST ─────────────────────────────────────────── */
+#toast {
+  position: fixed; bottom: 22px; right: 22px;
+  background: var(--text); color: var(--bg);
+  padding: 9px 15px;
+  font-size: 11px; letter-spacing: .04em;
+  opacity: 0; transform: translateY(5px);
+  transition: opacity .18s, transform .18s;
+  pointer-events: none; z-index: 999;
+}
+#toast.show { opacity: 1; transform: translateY(0); }
+
+/* ── SECURE ACCESS ─────────────────────────────────── */
+.access-screen {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: var(--bg2);
+}
+.access-card {
+  width: min(100%, 430px);
+  padding: 30px;
+  border: 1px solid var(--border2);
+  background: var(--surface);
+  box-shadow: 0 24px 80px rgba(0,0,0,.12);
+}
+.access-brand {
+  font-family: var(--display);
+  font-size: 26px;
+  letter-spacing: .05em;
+  margin-bottom: 4px;
+}
+.access-kicker {
+  color: var(--text-muted);
+  font-size: 11px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  margin-bottom: 22px;
+}
+.access-title { font-size: 18px; font-weight: 500; margin-bottom: 8px; }
+.access-copy { color: var(--text-muted); font-size: 12px; margin-bottom: 20px; }
+.access-label { display: block; font-size: 11px; color: var(--text-muted); margin: 12px 0 5px; }
+.access-input {
+  width: 100%; height: 42px; padding: 0 11px;
+  border: 1px solid var(--border2); background: var(--surface); color: var(--text);
+  font: 14px var(--body);
+}
+.access-input:focus { outline: 2px solid var(--text); outline-offset: 1px; }
+.access-submit {
+  width: 100%; min-height: 42px; margin-top: 18px;
+  border: 1px solid var(--text); background: var(--text); color: var(--bg);
+  font: 500 12px var(--body); letter-spacing: .08em; text-transform: uppercase;
+  cursor: pointer;
+}
+.access-submit:disabled { opacity: .5; cursor: wait; }
+.access-error { min-height: 18px; margin-top: 10px; color: var(--red); font-size: 12px; }
+.access-note { margin-top: 18px; padding-top: 15px; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 11px; }
+.security-actions { display: flex; align-items: center; gap: 6px; }
+.security-menu { display: flex; gap: 6px; flex-wrap: wrap; }
+.file-input { display: none; }
+.password-strength { margin-top: 6px; color: var(--text-muted); font-size: 11px; }
+
+@media (max-width: 720px) {
+  header { height: auto; min-height: 50px; padding: 9px 14px; flex-wrap: wrap; gap: 8px; }
+  .h-left, .h-right { width: 100%; justify-content: space-between; }
+  .h-right { overflow-x: auto; padding-bottom: 2px; }
+  .security-actions { flex: 0 0 auto; }
+  .security-actions .hbtn-ghost { font-size: 9px; }
+  .h-date { display: none; }
+  .kpi-bar { grid-template-columns: repeat(2, 1fr); }
+  .kpi-item { padding: 13px 14px; }
+  .kpi-item:nth-child(2) { border-right: none; }
+  .kpi-item:nth-child(-n+2) { border-bottom: 1px solid var(--border); }
+  .kpi-val { font-size: 24px; }
+  .content { padding: 18px 12px; }
+  .month-toolbar { align-items: flex-start; flex-direction: column; }
+  .month-controls { width: 100%; }
+  .month-picker { flex: 1; min-width: 0; }
+  .month-row { grid-template-columns: minmax(0, 1fr) 100px; gap: 8px 10px; padding: 10px; }
+  .month-date-input { grid-column: 1; grid-row: 2; }
+  .month-movement { grid-column: 1 / -1; grid-row: 1; }
+  .month-status-select { grid-column: 2; grid-row: 2; }
+  .month-amount { grid-column: 2; grid-row: 1; }
+  .month-meta { white-space: normal; }
+  .section-head, .section table, .section .tfoot { min-width: 720px; }
+  .access-card { padding: 22px; }
+}
+</style>
+</head>
+<body>
+
+<section class="access-screen" id="access-screen" aria-labelledby="access-title">
+  <form class="access-card" id="access-form" autocomplete="off">
+    <div class="access-brand">Manolo y María</div>
+    <div class="access-kicker">Finanzas cifradas</div>
+    <h1 class="access-title" id="access-title">Acceso privado</h1>
+    <p class="access-copy" id="access-copy">Identifícate ante GitHub y usa la contraseña para descifrar la copia compartida.</p>
+    <div id="unlock-fields">
+      <label class="access-label" for="github-token">Token de GitHub</label>
+      <input class="access-input" id="github-token" type="password" autocomplete="off" spellcheck="false" required>
+      <label class="access-label" for="access-password">Contraseña</label>
+      <input class="access-input" id="access-password" type="password" autocomplete="current-password" required>
+    </div>
+    <div id="change-fields" hidden>
+      <label class="access-label" for="new-password">Nueva contraseña</label>
+      <input class="access-input" id="new-password" type="password" autocomplete="new-password" minlength="12">
+      <label class="access-label" for="confirm-password">Repite la nueva contraseña</label>
+      <input class="access-input" id="confirm-password" type="password" autocomplete="new-password" minlength="12">
+      <div class="password-strength">Mínimo 12 caracteres. Se recomienda una frase larga y exclusiva.</div>
+    </div>
+    <button class="access-submit" id="access-submit" type="submit">Desbloquear</button>
+    <div class="access-error" id="access-error" role="alert"></div>
+    <p class="access-note">La contraseña nunca sale del dispositivo. El token se envía únicamente a la API de GitHub y se conserva solo mientras la pestaña permanezca abierta.</p>
+  </form>
+</section>
+
+<div id="app">
+  <header>
+    <div class="h-left">
+      <div class="h-logo">M&M <span>· Finanzas</span></div>
+      <div class="h-sep"></div>
+      <div class="h-date" id="h-date"></div>
+    </div>
+    <div class="h-right">
+      <div class="security-actions">
+        <button class="hbtn-ghost" type="button" onclick="openPasswordModal()">Contraseña</button>
+        <button class="hbtn-ghost" type="button" onclick="exportVault()">Backup</button>
+        <button class="hbtn-ghost" type="button" onclick="document.getElementById('backup-input').click()">Restaurar</button>
+        <button class="hbtn-ghost" type="button" onclick="lockApp()">Salir</button>
+        <input class="file-input" id="backup-input" type="file" accept="application/json,.json" onchange="importVault(event)">
+      </div>
+      <button class="hbtn-sq" onclick="toggleTheme()" title="Cambiar tema">
+        <svg id="icon-sun" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg id="icon-moon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <button class="hbtn" id="save-btn" onclick="saveData()">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Guardar
+      </button>
+    </div>
+  </header>
+
+  <div class="kpi-bar">
+    <div class="kpi-item"><div class="kpi-label">Ingresos del mes</div><div class="kpi-val income" id="kpi-ingresos">—</div></div>
+    <div class="kpi-item"><div class="kpi-label">Gastos del mes</div><div class="kpi-val expense" id="kpi-gastos">—</div></div>
+    <div class="kpi-item"><div class="kpi-label">Balance del mes</div><div class="kpi-val" id="kpi-sit">—</div></div>
+    <div class="kpi-item"><div class="kpi-label">Saldo final estimado</div><div class="kpi-val" id="kpi-closing-balance">—</div></div>
+  </div>
+
+  <div class="content">
+
+    <div class="month-section">
+      <div class="month-toolbar">
+        <div class="month-title-wrap">
+          <div class="month-title" id="month-title">Movimientos del mes</div>
+          <div class="month-subtitle">Edita el día recurrente y marca cada movimiento mensual como previsto o cobrado.</div>
+        </div>
+        <div class="month-controls">
+          <button class="month-nav" id="month-prev" type="button" onclick="shiftSelectedMonth(-1)" aria-label="Mes anterior">‹</button>
+          <input class="month-picker" id="month-picker" type="month" min="2026-07" onchange="setSelectedMonth(this.value)">
+          <button class="month-nav" id="month-next" type="button" onclick="shiftSelectedMonth(1)" aria-label="Mes siguiente">›</button>
+        </div>
+      </div>
+      <div class="month-finance">
+        <div class="month-finance-item">
+          <label class="month-finance-label" for="month-opening-balance">Saldo al comenzar el mes</label>
+          <input class="month-opening-input" id="month-opening-balance" type="text" inputmode="decimal" placeholder="Introduce el saldo" oninput="updateOpeningBalance(this.value)" onblur="finalizeOpeningBalance()">
+        </div>
+      </div>
+      <div class="monthly-ledger" id="monthly-ledger"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <div class="section-title">Ingresos mensuales</div>
+        <button class="add-btn" onclick="addRow('ingresos')">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Añadir
+        </button>
+      </div>
+      <table id="table-ingresos">
+        <thead><tr>
+          <th class="th-xs"></th>
+          <th class="th-color">Color</th>
+          <th>Elemento</th>
+          <th class="th-r sortable" onclick="toggleSort('ingresos')">Importe<span class="sort-arrow" id="sort-ingresos"></span></th>
+          <th>Frecuencia</th>
+          <th>Notas</th>
+          <th class="th-xs"></th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+      <div class="tfoot"><span class="tfoot-label">Total ingresos</span><span class="tfoot-val" id="total-ingresos">—</span></div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <div class="section-title">Gastos mensuales</div>
+        <button class="add-btn" onclick="addRow('gastos')">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Añadir
+        </button>
+      </div>
+      <table id="table-gastos">
+        <thead><tr>
+          <th class="th-xs"></th>
+          <th class="th-color">Color</th>
+          <th>Elemento</th>
+          <th class="th-r sortable" onclick="toggleSort('gastos')">Importe<span class="sort-arrow" id="sort-gastos"></span></th>
+          <th>Frecuencia</th>
+          <th>Día</th>
+          <th>Renovación</th>
+          <th>Notas</th>
+          <th class="th-xs"></th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+      <div class="tfoot"><span class="tfoot-label">Total gastos</span><span class="tfoot-val" id="total-gastos">—</span></div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <div class="section-title">Gastos no mensuales</div>
+        <button class="add-btn" onclick="addRow('sinSuscripcion')">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Añadir
+        </button>
+      </div>
+      <table id="table-sinSuscripcion">
+        <thead><tr>
+          <th class="th-xs"></th>
+          <th class="th-color">Color</th>
+          <th>Elemento</th>
+          <th class="th-r">Importe</th>
+          <th>Frecuencia</th>
+          <th>Día</th>
+          <th>Renovación</th>
+          <th>Notas</th>
+          <th class="th-xs"></th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+      <div class="tfoot"><span class="tfoot-label">Coste medio mensual</span><span class="tfoot-val" id="total-no-mensuales">—</span></div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <div class="section-title">Suscripciones anuales</div>
+        <button class="add-btn" onclick="addRow('anuales')">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Añadir
+        </button>
+      </div>
+      <table id="table-anuales">
+        <thead><tr>
+          <th class="th-xs"></th>
+          <th class="th-color">Color</th>
+          <th>Elemento</th>
+          <th class="th-r sortable" onclick="toggleSort('anuales')">Importe<span class="sort-arrow" id="sort-anuales"></span></th>
+          <th>Frecuencia</th>
+          <th>Fecha</th>
+          <th>Renovación</th>
+          <th>Notas</th>
+          <th class="th-xs"></th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+      <div class="tfoot"><span class="tfoot-label">Total anual</span><span class="tfoot-val" id="total-anuales">—</span></div>
+    </div>
+
+    <div class="hint-bar">
+      <span class="hint-text">Al pulsar Guardar, los datos se cifran en este navegador. Usa Backup para conservar una copia o trasladarlos a otro dispositivo.</span>
+    </div>
+
+  </div>
+</div>
+
+<div class="modal-backdrop" id="password-modal" role="dialog" aria-modal="true" aria-labelledby="password-modal-title" hidden onclick="handlePasswordBackdrop(event)">
+  <form class="modal-card" id="password-form">
+    <div class="modal-head">
+      <div class="modal-title" id="password-modal-title">Cambiar contraseña</div>
+      <button class="modal-close" type="button" onclick="closePasswordModal()" aria-label="Cerrar">×</button>
+    </div>
+    <div class="modal-body">
+      <label class="modal-label" for="password-current">Contraseña actual</label>
+      <input class="access-input" id="password-current" type="password" autocomplete="current-password" required>
+      <label class="modal-label" for="password-new">Nueva contraseña</label>
+      <input class="access-input" id="password-new" type="password" autocomplete="new-password" minlength="12" required>
+      <label class="modal-label" for="password-confirm">Repite la nueva contraseña</label>
+      <input class="access-input" id="password-confirm" type="password" autocomplete="new-password" minlength="12" required>
+      <div class="access-error" id="password-error" role="alert"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn" type="button" onclick="closePasswordModal()">Cancelar</button>
+      <button class="modal-btn primary" type="submit">Actualizar</button>
+    </div>
+  </form>
+</div>
+
+<div class="modal-backdrop" id="observation-modal" role="dialog" aria-modal="true" aria-labelledby="observation-modal-title" hidden onclick="handleObservationBackdrop(event)">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div class="modal-title" id="observation-modal-title">Observaciones</div>
+      <button class="modal-close" type="button" onclick="closeObservationModal()" aria-label="Cerrar">×</button>
+    </div>
+    <div class="modal-body">
+      <label class="modal-label" for="observation-text">Observaciones</label>
+      <textarea class="modal-textarea" id="observation-text"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn" type="button" onclick="closeObservationModal()">Cancelar</button>
+      <button class="modal-btn primary" type="button" onclick="applyObservation()">Aplicar</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const GITHUB_OWNER = 'francesrevert';
+const GITHUB_REPO = 'francesrevert';
+const GITHUB_BRANCH = 'main';
+const VAULT_PATH = 'vault.json';
+const GITHUB_API_VERSION = '2022-11-28';
+const THEME_STORAGE_KEY = 'mm_finance_theme';
+const PBKDF2_ITERATIONS = 600000;
+const LOCK_AFTER_MS = 15 * 60 * 1000;
+let data = null;
+let vaultKey = null;
+let currentVault = null;
+let githubToken = '';
+let remoteVaultSha = '';
+let accessMode = 'unlock';
+let lastActivityAt = Date.now();
+const sortState = { ingresos: null, gastos: null, anuales: null };
+const MIN_SELECTED_MONTH = new Date(new Date().getFullYear() - 1, 0, 1);
+let selectedMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+if (selectedMonth < MIN_SELECTED_MONTH) selectedMonth = new Date(MIN_SELECTED_MONTH);
+let observationEditor = null;
+
+// ── THEME ──────────────────────────────────────────────
+function applyTheme(t) {
+  document.documentElement.setAttribute('data-theme', t);
+  localStorage.setItem(THEME_STORAGE_KEY, t);
+  document.getElementById('icon-sun').style.display  = t === 'dark'  ? 'block' : 'none';
+  document.getElementById('icon-moon').style.display = t === 'light' ? 'block' : 'none';
+}
+function toggleTheme() {
+  applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+}
+applyTheme(localStorage.getItem(THEME_STORAGE_KEY) || 'light');
+
+// ── SECURE VAULT ───────────────────────────────────────
+const encoder = new TextEncoder();
+const decoder = new TextDecoder();
+
+function bytesToBase64(bytes) {
+  let binary = '';
+  bytes.forEach(byte => { binary += String.fromCharCode(byte); });
+  return btoa(binary);
+}
+function base64ToBytes(value) {
+  return Uint8Array.from(atob(value), char => char.charCodeAt(0));
+}
+async function deriveVaultKey(password, salt, iterations = PBKDF2_ITERATIONS) {
+  const material = await crypto.subtle.importKey('raw', encoder.encode(password), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey(
+    { name: 'PBKDF2', salt, iterations, hash: 'SHA-256' }, material,
+    { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']
+  );
+}
+function validateVault(vault) {
+  if (vault.version !== 1 || vault.cipher !== 'AES-GCM' || vault.kdf?.name !== 'PBKDF2-SHA256') {
+    throw new Error('Formato de copia cifrada no compatible.');
+  }
+  const iterations = Number(vault.kdf.iterations);
+  if (!Number.isInteger(iterations) || iterations < 300000 || iterations > 1000000) {
+    throw new Error('Parámetros de cifrado no válidos.');
+  }
+  if (base64ToBytes(vault.kdf.salt).length !== 16 || base64ToBytes(vault.iv).length !== 12 || base64ToBytes(vault.ciphertext).length < 17) {
+    throw new Error('La copia cifrada está incompleta o dañada.');
+  }
+  return vault;
+}
+function githubHeaders(token) {
+  return {
+    Accept: 'application/vnd.github+json',
+    Authorization: `Bearer ${token}`,
+    'X-GitHub-Api-Version': GITHUB_API_VERSION
+  };
+}
+function vaultApiUrl() {
+  return `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${VAULT_PATH}`;
+}
+async function fetchRemoteVault(token) {
+  const response = await fetch(`${vaultApiUrl()}?ref=${encodeURIComponent(GITHUB_BRANCH)}`, {
+    headers: githubHeaders(token),
+    cache: 'no-store'
+  });
+  if (response.status === 401 || response.status === 403) {
+    throw new Error('GitHub ha rechazado el token. Comprueba que siga vigente y tenga permiso Contents: read and write.');
+  }
+  if (response.status === 404) throw new Error('GitHub no encuentra el archivo cifrado o el token no tiene acceso al repositorio.');
+  if (!response.ok) throw new Error(`GitHub no ha podido leer los datos (${response.status}).`);
+  const result = await response.json();
+  const raw = decoder.decode(base64ToBytes(String(result.content || '').replace(/\s/g, '')));
+  return { vault: validateVault(JSON.parse(raw)), sha: result.sha };
+}
+async function putRemoteVault(vault, message) {
+  const content = bytesToBase64(encoder.encode(`${JSON.stringify(vault, null, 2)}\n`));
+  const response = await fetch(vaultApiUrl(), {
+    method: 'PUT',
+    headers: { ...githubHeaders(githubToken), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message, content, sha: remoteVaultSha, branch: GITHUB_BRANCH })
+  });
+  if (response.status === 409) {
+    throw new Error('Otra persona ha guardado cambios antes. Sal y vuelve a entrar para cargar la última versión.');
+  }
+  if (response.status === 401 || response.status === 403) {
+    throw new Error('GitHub ha rechazado el guardado. Revisa el token y su permiso Contents: read and write.');
+  }
+  if (!response.ok) throw new Error(`GitHub no ha podido guardar los datos (${response.status}).`);
+  const result = await response.json();
+  remoteVaultSha = result.content.sha;
+  currentVault = vault;
+}
+async function decryptVault(vault, password) {
+  const salt = base64ToBytes(vault.kdf.salt);
+  const key = await deriveVaultKey(password, salt, vault.kdf.iterations);
+  const plaintext = await crypto.subtle.decrypt(
+    { name: 'AES-GCM', iv: base64ToBytes(vault.iv) }, key, base64ToBytes(vault.ciphertext)
+  );
+  return { key, payload: JSON.parse(decoder.decode(plaintext)) };
+}
+async function encryptData(key, payload) {
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const ciphertext = await crypto.subtle.encrypt(
+    { name: 'AES-GCM', iv }, key, encoder.encode(JSON.stringify(payload))
+  );
+  return { iv: bytesToBase64(iv), ciphertext: bytesToBase64(new Uint8Array(ciphertext)) };
+}
+async function createVault(password, payload, forcePasswordChange = false) {
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const key = await deriveVaultKey(password, salt);
+  const encrypted = await encryptData(key, payload);
+  const vault = {
+    version: 1,
+    cipher: 'AES-GCM',
+    kdf: { name: 'PBKDF2-SHA256', iterations: PBKDF2_ITERATIONS, salt: bytesToBase64(salt) },
+    iv: encrypted.iv,
+    ciphertext: encrypted.ciphertext,
+    forcePasswordChange,
+    updatedAt: new Date().toISOString()
+  };
+  return { vault, key };
+}
+async function persistEncryptedData() {
+  if (!githubToken || !vaultKey || !currentVault || !data) throw new Error('La sesión está bloqueada.');
+  const encrypted = await encryptData(vaultKey, data);
+  const vault = { ...currentVault, ...encrypted, forcePasswordChange: false, updatedAt: new Date().toISOString() };
+  await putRemoteVault(vault, `finanzas: actualizar datos ${new Date().toLocaleString('es-ES')}`);
+}
+function setAccessBusy(busy) {
+  const button = document.getElementById('access-submit');
+  button.disabled = busy;
+  button.textContent = busy ? 'Verificando…' : (accessMode === 'bootstrap-change' ? 'Crear contraseña' : 'Desbloquear');
+}
+function setAccessError(message = '') {
+  document.getElementById('access-error').textContent = message;
+}
+function showBootstrapChange() {
+  accessMode = 'bootstrap-change';
+  document.getElementById('access-title').textContent = 'Crea una contraseña nueva';
+  document.getElementById('access-copy').textContent = 'La clave temporal ha sido validada. Este cambio es obligatorio antes de entrar.';
+  document.getElementById('unlock-fields').hidden = true;
+  document.getElementById('change-fields').hidden = false;
+  document.getElementById('new-password').required = true;
+  document.getElementById('confirm-password').required = true;
+  document.getElementById('access-submit').textContent = 'Crear contraseña';
+  document.getElementById('access-password').value = '';
+  document.getElementById('new-password').focus();
+}
+function validateNewPassword(password, confirmation) {
+  if (password.length < 12) return 'La contraseña debe tener al menos 12 caracteres.';
+  if (password !== confirmation) return 'Las contraseñas no coinciden.';
+  return '';
+}
+async function handleAccess(event) {
+  event.preventDefault();
+  setAccessError();
+  setAccessBusy(true);
+  try {
+    if (accessMode === 'bootstrap-change') {
+      const password = document.getElementById('new-password').value;
+      const confirmation = document.getElementById('confirm-password').value;
+      const validation = validateNewPassword(password, confirmation);
+      if (validation) throw new Error(validation);
+      const created = await createVault(password, data);
+      await putRemoteVault(created.vault, 'seguridad: sustituir contraseña temporal');
+      vaultKey = created.key;
+      document.getElementById('new-password').value = '';
+      document.getElementById('confirm-password').value = '';
+      openApp();
+      return;
+    }
+
+    const tokenInput = document.getElementById('github-token');
+    const passwordInput = document.getElementById('access-password');
+    const token = tokenInput.value.trim();
+    const password = passwordInput.value;
+    if (!token) throw new Error('Introduce el token de GitHub.');
+    const remote = await fetchRemoteVault(token);
+    const vault = remote.vault;
+    const unlocked = await decryptVault(vault, password);
+    passwordInput.value = '';
+    tokenInput.value = '';
+    githubToken = token;
+    remoteVaultSha = remote.sha;
+    currentVault = vault;
+    vaultKey = unlocked.key;
+    data = unlocked.payload;
+    if (vault.forcePasswordChange) {
+      showBootstrapChange();
+      return;
+    }
+    openApp();
+  } catch (error) {
+    setAccessError(error.message.includes('decrypt') || error.name === 'OperationError'
+      ? 'La contraseña no es correcta o la copia está dañada.'
+      : error.message);
+  } finally {
+    setAccessBusy(false);
+  }
+}
+function openApp() {
+  document.getElementById('h-date').textContent = new Date().toLocaleDateString('es-ES', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+  });
+  migrateFinanceData();
+  renderAll();
+  document.getElementById('access-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  lastActivityAt = Date.now();
+}
+function lockApp() {
+  data = null;
+  vaultKey = null;
+  currentVault = null;
+  githubToken = '';
+  remoteVaultSha = '';
+  location.reload();
+}
+function initAccess() {
+  document.getElementById('access-form').addEventListener('submit', handleAccess);
+  document.getElementById('github-token').focus();
+  ['pointerdown', 'keydown', 'touchstart'].forEach(name => {
+    document.addEventListener(name, () => { lastActivityAt = Date.now(); }, { passive: true });
+  });
+  setInterval(() => {
+    if (vaultKey && Date.now() - lastActivityAt >= LOCK_AFTER_MS) lockApp();
+  }, 30000);
+}
+initAccess();
+
+// ── RENDER ─────────────────────────────────────────────
+function renderAll() {
+  ['ingresos','gastos','sinSuscripcion','anuales'].forEach(renderSection);
+  updateKPIs();
+}
+
+function renderSection(s) {
+  const tbody = document.querySelector(`#table-${s} tbody`);
+  tbody.innerHTML = '';
+
+  (data[s] || []).forEach((row, idx) => {
+    ensurePlanFields(row, s);
+    const tr = document.createElement('tr');
+    if (s !== 'ingresos' && row.pendienteRenovacion) tr.classList.add('pending-renewal');
+
+    // Aplica color de fondo a la fila con opacidad baja
+    if (row.color) {
+      tr.style.background = hexToRgba(row.color, 0.08);
+    }
+
+    // drag handle
+    const tdH = mk('td', 'td-handle');
+    tdH.innerHTML = `<svg width="10" height="14" viewBox="0 0 10 14" fill="currentColor"><circle cx="2" cy="2" r="1.1"/><circle cx="8" cy="2" r="1.1"/><circle cx="2" cy="7" r="1.1"/><circle cx="8" cy="7" r="1.1"/><circle cx="2" cy="12" r="1.1"/><circle cx="8" cy="12" r="1.1"/></svg>`;
+    tr.appendChild(tdH);
+
+    // color dot + picker
+    const tdCol = mk('td', 'td-color');
+    const dotWrap = mk('div', 'color-dot-wrap');
+    const dot = mk('div', 'color-dot');
+    dot.style.background = row.color || 'transparent';
+    if (!row.color) dot.style.borderStyle = 'dashed';
+
+    const picker = document.createElement('input');
+    picker.type = 'color';
+    picker.className = 'color-picker-input';
+    picker.value = row.color || '#cccccc';
+
+    dot.addEventListener('click', () => picker.click());
+
+    picker.addEventListener('input', () => {
+      const i = rowIdx(s, tr);
+      data[s][i].color = picker.value;
+      dot.style.background = picker.value;
+      dot.style.borderStyle = 'solid';
+      tr.style.background = hexToRgba(picker.value, 0.08);
+    });
+    picker.addEventListener('change', () => {
+      const i = rowIdx(s, tr);
+      data[s][i].color = picker.value;
+    });
+
+    dotWrap.appendChild(dot);
+    dotWrap.appendChild(picker);
+    tdCol.appendChild(dotWrap);
+    tr.appendChild(tdCol);
+
+    // elemento
+    const tdEl = mk('td', 'td-el');
+    tdEl.appendChild(makeEditable(row.elemento, v => { data[s][rowIdx(s,tr)].elemento = v; }));
+    tr.appendChild(tdEl);
+
+    // importe
+    const tdImp = mk('td', 'td-imp');
+    const impSp = mk('span', 'editable');
+    const monthlyVariable = s === 'ingresos' && row.edicionMensual;
+    const displayedAmount = tableAmount(row, s);
+    if (monthlyVariable) tdImp.title = `Importe de ${fullMonthNames[selectedPeriod().month - 1]} de ${selectedPeriod().year}`;
+    impSp.contentEditable = true;
+    impSp.textContent = displayedAmount != null ? eur(displayedAmount) : '—';
+    impSp.addEventListener('focus', () => {
+      const amount = tableAmount(row, s);
+      impSp.textContent = amount != null ? String(amount).replace('.', ',') : '';
+    });
+    if (monthlyVariable) {
+      impSp.addEventListener('input', () => {
+        updateMonthlyIncome(row, parseLocalizedAmount(impSp.textContent), false);
+        updateKPIs();
+      });
+    }
+    impSp.addEventListener('blur', () => {
+      const amount = parseLocalizedAmount(impSp.textContent);
+      if (monthlyVariable) {
+        updateMonthlyIncome(row, amount, true);
+        impSp.textContent = amount != null ? eur(amount) : '—';
+      } else {
+        const i = rowIdx(s, tr);
+        data[s][i].importe = amount;
+        impSp.textContent = amount != null ? eur(amount) : '—';
+      }
+      updateKPIs();
+    });
+    tdImp.appendChild(impSp); tr.appendChild(tdImp);
+
+    // planificación: los datos quedan estructurados para presupuesto y próximos cargos
+    const tdFreq = mk('td', 'td-meta');
+    tdFreq.appendChild(makeEditable(row.frecuencia, v => {
+      data[s][rowIdx(s,tr)].frecuencia = v || defaultFrequency(s);
+      updateKPIs();
+    }));
+    tr.appendChild(tdFreq);
+
+    if (s !== 'ingresos') {
+      const tdDay = mk('td', 'td-meta');
+      tdDay.appendChild(makeEditable(s === 'anuales' ? formatAnnualDate(row) : (row.dia != null ? String(row.dia) : '—'), v => {
+        const target = data[s][rowIdx(s,tr)];
+        const parsed = s === 'anuales' ? parseAnnualDate(v) : { day: Number.parseInt(v, 10) };
+        target.dia = Number.isInteger(parsed.day) && parsed.day >= 1 && parsed.day <= 31 ? parsed.day : null;
+        if (s === 'anuales' && parsed.month) target.mesesDeCargo = [parsed.month];
+        updateKPIs();
+      }));
+      tr.appendChild(tdDay);
+    }
+
+    if (s !== 'ingresos') {
+      const tdRenewal = mk('td', 'td-renewal');
+      const renewalBtn = mk('button', `renewal-toggle${row.pendienteRenovacion ? ' pending' : ''}`);
+      renewalBtn.type = 'button';
+      renewalBtn.textContent = row.pendienteRenovacion ? 'Por renovar' : 'Activa';
+      renewalBtn.setAttribute('aria-pressed', row.pendienteRenovacion ? 'true' : 'false');
+      if (row.pendienteRenovacionDesde) renewalBtn.title = `Excluido desde ${row.pendienteRenovacionDesde}`;
+      renewalBtn.addEventListener('click', () => togglePendingRenewal(s, String(row.id || '')));
+      tdRenewal.appendChild(renewalBtn);
+      tr.appendChild(tdRenewal);
+    }
+
+    // Las observaciones se editan en un modal para mantener compactas las tablas.
+    const tdObs = mk('td', 'td-obs');
+    const notesBtn = mk('button', `notes-btn${row.observaciones ? ' has-notes' : ''}`);
+    notesBtn.type = 'button';
+    notesBtn.textContent = row.observaciones ? 'Ver nota' : 'Añadir';
+    notesBtn.setAttribute('aria-label', `${row.observaciones ? 'Ver o editar' : 'Añadir'} observaciones de ${row.elemento || 'este movimiento'}`);
+    notesBtn.addEventListener('click', () => openObservationModal(s, String(row.id || '')));
+    tdObs.appendChild(notesBtn);
+    tr.appendChild(tdObs);
+
+    // delete
+    const tdDel = mk('td', 'td-del');
+    const delBtn = mk('button', 'del-btn');
+    delBtn.title = 'Eliminar';
+    delBtn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6M9 6V4h6v2"/></svg>`;
+    delBtn.addEventListener('click', () => {
+      data[s].splice(rowIdx(s,tr), 1);
+      renderSection(s); updateKPIs(); showToast('Fila eliminada');
+    });
+    tdDel.appendChild(delBtn); tr.appendChild(tdDel);
+
+    // drag & drop
+    tr.setAttribute('draggable', true);
+    tr.addEventListener('dragstart', e => {
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', String(idx));
+      setTimeout(() => tr.classList.add('dragging'), 0);
+    });
+    tr.addEventListener('dragend', () => {
+      tr.classList.remove('dragging');
+      tbody.querySelectorAll('tr').forEach(r => r.classList.remove('drop-top','drop-bot'));
+    });
+    tr.addEventListener('dragover', e => {
+      e.preventDefault(); e.dataTransfer.dropEffect = 'move';
+      tbody.querySelectorAll('tr').forEach(r => r.classList.remove('drop-top','drop-bot'));
+      const mid = tr.getBoundingClientRect().top + tr.getBoundingClientRect().height / 2;
+      tr.classList.add(e.clientY < mid ? 'drop-top' : 'drop-bot');
+    });
+    tr.addEventListener('dragleave', () => tr.classList.remove('drop-top','drop-bot'));
+    tr.addEventListener('drop', e => {
+      e.preventDefault();
+      tbody.querySelectorAll('tr').forEach(r => r.classList.remove('drop-top','drop-bot'));
+      const fromIdx = parseInt(e.dataTransfer.getData('text/plain'));
+      const toIdx   = rowIdx(s, tr);
+      if (fromIdx === toIdx) return;
+      const mid   = tr.getBoundingClientRect().top + tr.getBoundingClientRect().height / 2;
+      const after = e.clientY >= mid;
+      const moved = data[s].splice(fromIdx, 1)[0];
+      const adj   = after
+        ? (toIdx > fromIdx ? toIdx : toIdx)
+        : (toIdx > fromIdx ? toIdx - 1 : toIdx);
+      data[s].splice(adj, 0, moved);
+      if (sortState[s]) { sortState[s] = null; updateSortArrow(s); }
+      renderSection(s); updateKPIs();
+    });
+
+    tbody.appendChild(tr);
+  });
+
+  updateTotals(s);
+}
+
+// ── MONTHLY VIEW ────────────────────────────────────────
+const fullMonthNames = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+
+function selectedPeriod() {
+  return {
+    year: selectedMonth.getFullYear(),
+    month: selectedMonth.getMonth() + 1,
+    key: `${selectedMonth.getFullYear()}-${String(selectedMonth.getMonth() + 1).padStart(2, '0')}`
+  };
+}
+function setSelectedMonth(value) {
+  const match = String(value || '').match(/^(\d{4})-(\d{2})$/);
+  if (!match) return;
+  const candidate = new Date(Number(match[1]), Number(match[2]) - 1, 1);
+  selectedMonth = candidate < MIN_SELECTED_MONTH ? new Date(MIN_SELECTED_MONTH) : candidate;
+  renderSection('ingresos');
+  updateKPIs();
+}
+function shiftSelectedMonth(offset) {
+  const candidate = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth() + offset, 1);
+  selectedMonth = candidate < MIN_SELECTED_MONTH ? new Date(MIN_SELECTED_MONTH) : candidate;
+  renderSection('ingresos');
+  updateKPIs();
+}
+function updateMonthNavigation() {
+  document.getElementById('month-prev').disabled = selectedMonth <= MIN_SELECTED_MONTH;
+}
+function dateMatchesPeriod(value, period) {
+  const match = String(value || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  return Boolean(match && Number(match[1]) === period.year && Number(match[2]) === period.month);
+}
+function dayFromDate(value) {
+  const match = String(value || '').match(/^\d{4}-\d{2}-(\d{2})$/);
+  return match ? Number(match[1]) : null;
+}
+function isWithinActiveDates(row, period) {
+  const first = new Date(period.year, period.month - 1, 1);
+  const last = new Date(period.year, period.month, 0);
+  const start = parseIsoDate(row.fechaInicio);
+  const end = parseIsoDate(row.fechaFin);
+  return (!start || last >= start) && (!end || first <= end);
+}
+function addPeriodEntry(entries, row, section, amount, options = {}) {
+  const numericAmount = Number(amount);
+  if (!Number.isFinite(numericAmount)) return;
+  entries.push({
+    id: `${section}-${row.id || row.elemento}-${options.date || options.day || 'month'}`,
+    type: section === 'ingresos' ? 'income' : 'expense',
+    element: row.elemento || 'Sin nombre',
+    amount: numericAmount,
+    day: options.day ?? dayFromDate(options.date) ?? row.dia ?? null,
+    color: row.color || null,
+    status: options.status || 'previsto',
+    detail: options.detail || row.frecuencia || '',
+    actual: Boolean(options.actual),
+    rowId: String(row.id || ''),
+    section,
+    date: options.date || null
+  });
+}
+function incomeEntries(row, period, entries) {
+  if (!isWithinActiveDates(row, period)) return;
+  const history = row.historialMensual && row.historialMensual[period.key];
+  if (history) {
+    const detail = Number.isFinite(Number(history.dias)) ? `${history.dias} días · ${row.frecuencia || 'Variable'}` : (row.frecuencia || 'Ingreso');
+    addPeriodEntry(entries, row, 'ingresos', history.importe, {
+      date: history.fecha,
+      status: history.estado || 'registrado',
+      detail,
+      actual: history.estado === 'cobrado'
+    });
+    return;
+  }
+  if (dateMatchesPeriod(row.fechaIngreso, period)) {
+    addPeriodEntry(entries, row, 'ingresos', row.importe, {
+      date: row.fechaIngreso,
+      status: row.estado || 'registrado',
+      detail: row.categoria || 'Ingreso extraordinario',
+      actual: row.estado === 'cobrado'
+    });
+    return;
+  }
+  if (/^mensual/i.test(row.frecuencia || '')) {
+    addPeriodEntry(entries, row, 'ingresos', row.importe, {
+      status: 'previsto',
+      detail: row.frecuencia
+    });
+  }
+}
+function expenseEntries(row, section, period, entries) {
+  if (!isWithinActiveDates(row, period) || isPendingRenewalForPeriod(row, period)) return;
+
+  const recorded = (row.historialFacturas || []).filter(item => dateMatchesPeriod(item.fecha, period));
+  if (recorded.length) {
+    recorded.forEach(item => addPeriodEntry(entries, row, section, item.importe, {
+      date: item.fecha,
+      status: item.estado || 'registrado',
+      detail: row.frecuencia,
+      actual: item.estado === 'cobrado'
+    }));
+    return;
+  }
+
+  if (row.cuotaFinalProrrateada && dateMatchesPeriod(row.cuotaFinalProrrateada.fecha, period)) {
+    addPeriodEntry(entries, row, section, row.cuotaFinalProrrateada.importe, {
+      date: row.cuotaFinalProrrateada.fecha,
+      status: 'previsto',
+      detail: `${row.cuotaFinalProrrateada.dias}/${row.cuotaFinalProrrateada.diasMes} días`
+    });
+    return;
+  }
+
+  const scheduledMonths = Array.isArray(row.mesesDeCargo) ? row.mesesDeCargo : null;
+  const recurring = /^mensual/i.test(row.frecuencia || '');
+  const scheduled = scheduledMonths && scheduledMonths.includes(period.month);
+  if (!recurring && !scheduled) return;
+
+  const day = Number.isInteger(row.dia) ? row.dia : 1;
+  const candidate = new Date(period.year, period.month - 1, Math.min(day, new Date(period.year, period.month, 0).getDate()));
+  if (isSuspended(row, candidate)) return;
+
+  addPeriodEntry(entries, row, section, row.importe, {
+    day,
+    status: 'previsto',
+    detail: row.frecuencia
+  });
+}
+function periodEntries() {
+  const period = selectedPeriod();
+  const entries = [];
+  (data.ingresos || []).forEach(row => incomeEntries(row, period, entries));
+  ['gastos','sinSuscripcion','anuales'].forEach(section => {
+    (data[section] || []).forEach(row => expenseEntries(row, section, period, entries));
+  });
+  return entries.sort((a, b) =>
+    (a.day ?? 99) - (b.day ?? 99) ||
+    (a.type === b.type ? 0 : a.type === 'expense' ? -1 : 1) ||
+    a.element.localeCompare(b.element, 'es')
+  );
+}
+function findMovementRow(section, rowId) {
+  return (data[section] || []).find(row => String(row.id || '') === String(rowId));
+}
+function dateForPeriodDay(period, day) {
+  if (!Number.isInteger(Number(day))) return '';
+  const lastDay = new Date(period.year, period.month, 0).getDate();
+  return `${period.key}-${String(Math.min(Number(day), lastDay)).padStart(2, '0')}`;
+}
+function updateMovementDate(section, rowId, value) {
+  const period = selectedPeriod();
+  if (!dateMatchesPeriod(value, period)) return;
+  const row = findMovementRow(section, rowId);
+  if (!row) return;
+  const day = dayFromDate(value);
+  const monthly = /^mensual/i.test(row.frecuencia || '');
+
+  if (section === 'ingresos') {
+    const history = row.historialMensual && row.historialMensual[period.key];
+    if (history) history.fecha = value;
+    else if (dateMatchesPeriod(row.fechaIngreso, period)) row.fechaIngreso = value;
+    if (monthly) row.dia = day;
+  } else {
+    const history = (row.historialFacturas || []).find(item => dateMatchesPeriod(item.fecha, period));
+    if (history) history.fecha = value;
+    if (row.cuotaFinalProrrateada && dateMatchesPeriod(row.cuotaFinalProrrateada.fecha, period)) {
+      row.cuotaFinalProrrateada.fecha = value;
+    }
+    row.dia = day;
+  }
+  updateKPIs();
+}
+function updateMovementStatus(section, rowId, status) {
+  const period = selectedPeriod();
+  const row = findMovementRow(section, rowId);
+  if (!row) return;
+  const normalized = status === 'cobrado' ? 'cobrado' : 'previsto';
+
+  if (section === 'ingresos') {
+    row.historialMensual = row.historialMensual || {};
+    const history = row.historialMensual[period.key];
+    if (history) {
+      history.estado = normalized;
+    } else if (dateMatchesPeriod(row.fechaIngreso, period)) {
+      row.estado = normalized;
+    } else {
+      row.historialMensual[period.key] = {
+        importe: Number(row.importe) || 0,
+        estado: normalized,
+        fecha: dateForPeriodDay(period, row.dia)
+      };
+    }
+  } else {
+    row.historialFacturas = row.historialFacturas || [];
+    let history = row.historialFacturas.find(item => dateMatchesPeriod(item.fecha, period));
+    if (!history) {
+      const amount = row.cuotaFinalProrrateada && dateMatchesPeriod(row.cuotaFinalProrrateada.fecha, period)
+        ? row.cuotaFinalProrrateada.importe
+        : row.importe;
+      history = {
+        fecha: dateForPeriodDay(period, row.dia || 1),
+        importe: Number(amount) || 0,
+        estado: normalized
+      };
+      row.historialFacturas.push(history);
+    } else {
+      history.estado = normalized;
+    }
+  }
+  updateKPIs();
+}
+function renderMonthlyOverview(entries) {
+  const period = selectedPeriod();
+  const picker = document.getElementById('month-picker');
+  const title = document.getElementById('month-title');
+  const target = document.getElementById('monthly-ledger');
+  picker.value = period.key;
+  title.textContent = `Movimientos de ${fullMonthNames[period.month - 1]} de ${period.year}`;
+  updateMonthNavigation();
+
+  const opening = Number(data.saldosIniciales?.[period.key]);
+  const hasOpening = Number.isFinite(opening);
+  document.getElementById('month-opening-balance').value = hasOpening ? formatEditableAmount(opening) : '';
+  renderClosingBalance(entries, period);
+
+  if (!entries.length) {
+    target.innerHTML = '<div class="month-empty">No hay movimientos asociados a este mes.</div>';
+    return;
+  }
+
+  const firstDate = `${period.key}-01`;
+  const lastDate = `${period.key}-${String(new Date(period.year, period.month, 0).getDate()).padStart(2, '0')}`;
+  target.innerHTML = entries.map(entry => {
+    const dateValue = entry.date || dateForPeriodDay(period, entry.day);
+    const sign = entry.type === 'income' ? '+' : '−';
+    const dotStyle = entry.color ? `background:${entry.color};border-color:${entry.color}` : '';
+    const status = entry.status === 'cobrado' ? 'cobrado' : 'previsto';
+    return `<div class="month-row ${entry.type}">
+      <input class="month-date-input" type="date" min="${firstDate}" max="${lastDate}" value="${dateValue}" data-section="${entry.section}" data-row-id="${escapeHtml(entry.rowId)}" aria-label="Fecha de ${escapeHtml(entry.element)}">
+      <div class="month-movement">
+        <div class="month-movement-main"><span class="month-dot" style="${dotStyle}"></span><span class="month-name">${escapeHtml(entry.element)}</span></div>
+        <div class="month-meta">${escapeHtml(entry.detail)}</div>
+      </div>
+      <select class="month-status-select ${status === 'cobrado' ? 'status-paid' : 'status-planned'}" data-section="${entry.section}" data-row-id="${escapeHtml(entry.rowId)}" aria-label="Estado de ${escapeHtml(entry.element)}">
+        <option value="previsto" ${status === 'previsto' ? 'selected' : ''}>Previsto</option>
+        <option value="cobrado" ${status === 'cobrado' ? 'selected' : ''}>Cobrado</option>
+      </select>
+      <div class="month-amount">${sign}${eur(entry.amount)}</div>
+    </div>`;
+  }).join('');
+
+  target.querySelectorAll('.month-date-input').forEach(input => {
+    input.addEventListener('change', () => updateMovementDate(input.dataset.section, input.dataset.rowId, input.value));
+  });
+  target.querySelectorAll('.month-status-select').forEach(select => {
+    select.addEventListener('change', () => updateMovementStatus(select.dataset.section, select.dataset.rowId, select.value));
+  });
+}
+
+// ── HELPERS ────────────────────────────────────────────
+function rowIdx(s, tr) {
+  return Array.from(document.querySelector(`#table-${s} tbody`).children).indexOf(tr);
+}
+function mk(tag, cls) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  return e;
+}
+function makeEditable(text, onBlur) {
+  const sp = mk('span', 'editable');
+  sp.contentEditable = true;
+  sp.textContent = text;
+  sp.addEventListener('blur', () => onBlur(sp.textContent.trim()));
+  return sp;
+}
+function defaultFrequency(section) {
+  return section === 'anuales' ? 'Anual' : section === 'sinSuscripcion' ? 'Único' : 'Mensual';
+}
+const monthNames = ['ene','feb','mar','abr','may','jun','jul','ago','sept','oct','nov','dic'];
+const monthLookup = Object.fromEntries(monthNames.map((name, index) => [name, index + 1]));
+function formatAnnualDate(row) {
+  const month = Array.isArray(row.mesesDeCargo) && row.mesesDeCargo.length === 1 ? row.mesesDeCargo[0] : null;
+  return row.dia != null && month ? `${row.dia} ${monthNames[month - 1]}` : (row.dia != null ? String(row.dia) : '—');
+}
+function parseAnnualDate(value) {
+  const match = String(value).trim().toLowerCase().match(/^(\d{1,2})(?:\s+([a-záéíóúñ.]+))?$/);
+  if (!match) return { day: null, month: null };
+  const monthText = (match[2] || '').replace('.', '').slice(0, 4);
+  return { day: Number.parseInt(match[1], 10), month: monthLookup[monthText] || null };
+}
+function parseLocalizedAmount(value) {
+  let normalized = String(value || '').trim().replace(/[€\s]/g, '');
+  if (!normalized) return null;
+  if (normalized.includes(',') && normalized.includes('.')) normalized = normalized.replace(/\./g, '').replace(',', '.');
+  else if (normalized.includes(',')) normalized = normalized.replace(',', '.');
+  const amount = Number(normalized);
+  return Number.isFinite(amount) ? amount : null;
+}
+function formatEditableAmount(value) {
+  return new Intl.NumberFormat('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
+}
+function tableAmount(row, section) {
+  if (section === 'ingresos' && row.edicionMensual) {
+    const amount = Number(row.historialMensual?.[selectedPeriod().key]?.importe);
+    return Number.isFinite(amount) ? amount : null;
+  }
+  const amount = Number(row.importe);
+  return Number.isFinite(amount) ? amount : null;
+}
+function roundMoney(value) {
+  return Math.round((Number(value) + Number.EPSILON) * 100) / 100;
+}
+function updateMonthlyIncome(row, amount, notify = true) {
+  const period = selectedPeriod();
+  row.historialMensual = row.historialMensual || {};
+  if (amount == null) {
+    delete row.historialMensual[period.key];
+  } else {
+    const history = row.historialMensual[period.key] || { estado: 'previsto' };
+    history.importe = amount;
+    if (!history.fecha) history.fecha = `${period.key}-${String(new Date(period.year, period.month, 0).getDate()).padStart(2, '0')}`;
+    if (Number.isFinite(Number(row.tarifaDiaria)) && Number(row.tarifaDiaria) > 0) {
+      const days = amount / Number(row.tarifaDiaria);
+      if (Number.isInteger(days)) history.dias = days;
+      else delete history.dias;
+    }
+    row.historialMensual[period.key] = history;
+  }
+  renderSection('sinSuscripcion');
+  if (notify) showToast(amount == null ? 'Importe mensual eliminado; pulsa Guardar' : 'Importe mensual actualizado; pulsa Guardar');
+}
+function updateOpeningBalance(value) {
+  const period = selectedPeriod();
+  data.saldosIniciales = data.saldosIniciales || {};
+  const amount = parseLocalizedAmount(value);
+  if (amount == null) delete data.saldosIniciales[period.key];
+  else data.saldosIniciales[period.key] = amount;
+  renderClosingBalance(periodEntries(), period);
+}
+function renderClosingBalance(entries, period = selectedPeriod()) {
+  const opening = Number(data.saldosIniciales?.[period.key]);
+  const hasOpening = Number.isFinite(opening);
+  const movementBalance = entries.reduce((sum, entry) => sum + (entry.type === 'income' ? entry.amount : -entry.amount), 0);
+  const closing = document.getElementById('kpi-closing-balance');
+  closing.textContent = hasOpening ? eur(opening + movementBalance) : '—';
+  closing.className = `kpi-val${hasOpening ? (opening + movementBalance >= 0 ? ' pos' : ' neg') : ''}`;
+}
+function finalizeOpeningBalance() {
+  const period = selectedPeriod();
+  const amount = Number(data.saldosIniciales?.[period.key]);
+  const hasAmount = Number.isFinite(amount);
+  document.getElementById('month-opening-balance').value = hasAmount ? formatEditableAmount(amount) : '';
+  showToast(hasAmount ? 'Saldo inicial actualizado; pulsa Guardar' : 'Saldo inicial eliminado; pulsa Guardar');
+}
+function ensurePlanFields(row, section) {
+  if (!row.frecuencia) row.frecuencia = defaultFrequency(section);
+  if (!('dia' in row)) row.dia = null;
+  if (!row.categoria) row.categoria = section === 'ingresos' ? 'Ingreso' : section === 'gastos' ? 'Gasto fijo' : 'Suscripción';
+  if (section !== 'ingresos') row.pendienteRenovacion = Boolean(row.pendienteRenovacion);
+}
+function isPendingRenewalForPeriod(row, period) {
+  if (!row.pendienteRenovacion) return false;
+  return !/^\d{4}-\d{2}$/.test(row.pendienteRenovacionDesde || '') || period.key >= row.pendienteRenovacionDesde;
+}
+function togglePendingRenewal(section, rowId) {
+  const row = findMovementRow(section, rowId);
+  if (!row || section === 'ingresos') return;
+  row.pendienteRenovacion = !row.pendienteRenovacion;
+  if (row.pendienteRenovacion) row.pendienteRenovacionDesde = selectedPeriod().key;
+  else delete row.pendienteRenovacionDesde;
+  renderSection(section);
+  updateKPIs();
+  showToast(row.pendienteRenovacion ? 'Gasto excluido del cálculo; pulsa Guardar' : 'Gasto reactivado; pulsa Guardar');
+}
+function openObservationModal(section, rowId) {
+  const row = findMovementRow(section, rowId);
+  if (!row) return;
+  observationEditor = { section, rowId };
+  document.getElementById('observation-modal-title').textContent = `Observaciones · ${row.elemento || 'Movimiento'}`;
+  document.getElementById('observation-text').value = row.observaciones || '';
+  document.getElementById('observation-modal').hidden = false;
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => document.getElementById('observation-text').focus(), 0);
+}
+function closeObservationModal() {
+  document.getElementById('observation-modal').hidden = true;
+  document.body.style.overflow = '';
+  observationEditor = null;
+}
+function handleObservationBackdrop(event) {
+  if (event.target.id === 'observation-modal') closeObservationModal();
+}
+function applyObservation() {
+  if (!observationEditor) return;
+  const row = findMovementRow(observationEditor.section, observationEditor.rowId);
+  if (!row) return closeObservationModal();
+  row.observaciones = document.getElementById('observation-text').value.trim();
+  const section = observationEditor.section;
+  closeObservationModal();
+  renderSection(section);
+  showToast('Observación actualizada; pulsa Guardar');
+}
+function migrateFinanceData() {
+  // Migración aditiva: no borra ni reinterpreta los datos y notas existentes.
+  if (!data.saldosIniciales || typeof data.saldosIniciales !== 'object' || Array.isArray(data.saldosIniciales)) data.saldosIniciales = {};
+  ['ingresos','gastos','sinSuscripcion','anuales'].forEach(section => {
+    (data[section] || []).forEach(row => ensurePlanFields(row, section));
+  });
+  data.planificacionVersion = Math.max(Number(data.planificacionVersion) || 0, 5);
+}
+function monthlyEquivalent(row) {
+  if (Number.isFinite(Number(row.presupuestoMensual))) return Number(row.presupuestoMensual);
+  const amount = Number(row.importe) || 0;
+  const frequency = (row.frecuencia || '').toLowerCase();
+  if (frequency.startsWith('anual')) return amount / 12;
+  if (frequency.startsWith('semestral')) return amount / 6;
+  if (frequency.startsWith('trimestral')) return amount / 3;
+  if (frequency.startsWith('bimensual')) return amount / 2;
+  if (frequency.startsWith('único') || frequency.startsWith('unico')) return 0;
+  return amount;
+}
+function parseIsoDate(value) {
+  const match = String(value || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  return match ? new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3])) : null;
+}
+function isSuspended(row, date = new Date()) {
+  const until = parseIsoDate(row.suspendidoHasta);
+  if (!until) return false;
+  const day = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  return day <= until;
+}
+function hexToRgba(hex, alpha) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+// ── SORT ───────────────────────────────────────────────
+function toggleSort(s) {
+  const cur = sortState[s];
+  sortState[s] = cur === null ? 'desc' : cur === 'desc' ? 'asc' : null;
+  if (sortState[s]) {
+    const d = sortState[s] === 'desc' ? -1 : 1;
+    data[s].sort((a,b) => d * ((tableAmount(b, s) || 0) - (tableAmount(a, s) || 0)));
+  }
+  updateSortArrow(s);
+  renderSection(s);
+}
+function updateSortArrow(s) {
+  const el = document.getElementById(`sort-${s}`);
+  if (el) el.textContent = sortState[s] === 'desc' ? ' ↓' : sortState[s] === 'asc' ? ' ↑' : '';
+}
+
+// ── KPIs ───────────────────────────────────────────────
+function sumSection(s) {
+  return (data[s] || []).reduce((sum, row) =>
+    sum + (s !== 'ingresos' && row.pendienteRenovacion ? 0 : (Number(row.importe) || 0)), 0);
+}
+function monthlyExpenses() {
+  const today = new Date();
+  return ['gastos','sinSuscripcion','anuales'].reduce((total, section) =>
+    total + (data[section] || []).reduce((sum, row) =>
+      sum + (row.pendienteRenovacion || isSuspended(row, today) ? 0 : monthlyEquivalent(row)), 0), 0);
+}
+function escapeHtml(value) {
+  const el = document.createElement('span');
+  el.textContent = value;
+  return el.innerHTML;
+}
+function updateTotals(s) {
+  const map = { ingresos:'total-ingresos', gastos:'total-gastos', sinSuscripcion:'total-no-mensuales', anuales:'total-anuales' };
+  if (!map[s]) return;
+  const total = s === 'sinSuscripcion'
+    ? (data[s] || []).reduce((sum, row) => sum + (row.pendienteRenovacion ? 0 : monthlyEquivalent(row)), 0)
+    : s === 'ingresos'
+      ? (data[s] || []).reduce((sum, row) => sum + (tableAmount(row, s) || 0), 0)
+      : sumSection(s);
+  document.getElementById(map[s]).textContent = eur(total);
+}
+function updateKPIs() {
+  const entries = periodEntries();
+  const income = entries.filter(entry => entry.type === 'income').reduce((sum, entry) => sum + entry.amount, 0);
+  const expenses = entries.filter(entry => entry.type === 'expense').reduce((sum, entry) => sum + entry.amount, 0);
+  const balance = income - expenses;
+  document.getElementById('kpi-ingresos').textContent = eur(income);
+  document.getElementById('kpi-gastos').textContent = eur(expenses);
+  const ks = document.getElementById('kpi-sit');
+  ks.textContent = eur(balance);
+  ks.className = 'kpi-val ' + (balance >= 0 ? 'pos' : 'neg');
+  renderMonthlyOverview(entries);
+  ['ingresos','gastos','sinSuscripcion','anuales'].forEach(updateTotals);
+}
+
+// ── ADD ────────────────────────────────────────────────
+function addRow(s) {
+  data[s].push({ id: s[0]+Date.now(), elemento:'Nuevo', importe:0, frecuencia:defaultFrequency(s), dia:null, categoria:s === 'ingresos' ? 'Ingreso' : 'Gasto', observaciones:'', color:null });
+  if (sortState[s]) { sortState[s]=null; updateSortArrow(s); }
+  renderSection(s); updateKPIs();
+  const last = document.querySelector(`#table-${s} tbody`).lastElementChild;
+  if (last) { const ed = last.querySelector('.td-el .editable'); if (ed) { ed.focus(); document.execCommand('selectAll',false,null); } }
+}
+
+async function saveData() {
+  const btn = document.getElementById('save-btn');
+  btn.disabled = true;
+  btn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Guardando…`;
+
+  try {
+    await persistEncryptedData();
+
+    btn.classList.add('ok');
+    btn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Guardado`;
+    showToast('Datos guardados en GitHub');
+    setTimeout(() => {
+      btn.classList.remove('ok');
+      btn.disabled = false;
+      btn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Guardar`;
+    }, 4000);
+
+  } catch (err) {
+    btn.disabled = false;
+    btn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Guardar`;
+    showToast(`Error al guardar: ${err.message}`);
+    console.error(err);
+  }
+}
+
+function openPasswordModal() {
+  document.getElementById('password-form').reset();
+  document.getElementById('password-error').textContent = '';
+  document.getElementById('password-modal').hidden = false;
+  document.body.style.overflow = 'hidden';
+  document.getElementById('password-current').focus();
+}
+function closePasswordModal() {
+  document.getElementById('password-modal').hidden = true;
+  document.body.style.overflow = '';
+  document.getElementById('password-form').reset();
+}
+function handlePasswordBackdrop(event) {
+  if (event.target.id === 'password-modal') closePasswordModal();
+}
+async function changePassword(event) {
+  event.preventDefault();
+  const errorTarget = document.getElementById('password-error');
+  const currentPassword = document.getElementById('password-current').value;
+  const nextPassword = document.getElementById('password-new').value;
+  const confirmation = document.getElementById('password-confirm').value;
+  errorTarget.textContent = '';
+  const validation = validateNewPassword(nextPassword, confirmation);
+  if (validation) { errorTarget.textContent = validation; return; }
+  if (nextPassword === currentPassword) { errorTarget.textContent = 'La nueva contraseña debe ser distinta.'; return; }
+  try {
+    await decryptVault(currentVault, currentPassword);
+    const created = await createVault(nextPassword, data);
+    await putRemoteVault(created.vault, 'seguridad: cambiar contraseña');
+    vaultKey = created.key;
+    closePasswordModal();
+    showToast('Contraseña actualizada en todos los dispositivos');
+  } catch (error) {
+    errorTarget.textContent = error.name === 'OperationError' ? 'La contraseña actual no es correcta.' : error.message;
+  }
+}
+function exportVault() {
+  if (!currentVault) return;
+  const blob = new Blob([`${JSON.stringify(currentVault, null, 2)}\n`], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `manolo-maria-finanzas-${new Date().toISOString().slice(0, 10)}.json`;
+  link.click();
+  URL.revokeObjectURL(url);
+  showToast('Backup cifrado descargado');
+}
+async function importVault(event) {
+  const file = event.target.files?.[0];
+  event.target.value = '';
+  if (!file) return;
+  try {
+    const imported = validateVault(JSON.parse(await file.text()));
+    if (!window.confirm('La restauración sustituirá la copia compartida actual. ¿Continuar?')) return;
+    await putRemoteVault({ ...imported, updatedAt: new Date().toISOString() }, 'finanzas: restaurar backup cifrado');
+    alert('Backup restaurado. La aplicación se bloqueará para que accedas con la contraseña de esa copia.');
+    lockApp();
+  } catch (error) {
+    showToast(`No se ha restaurado: ${error.message}`);
+  }
+}
+
+function eur(n) {
+  return n==null ? '—' : new Intl.NumberFormat('es-ES',{style:'currency',currency:'EUR',minimumFractionDigits:2}).format(n);
+}
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && !document.getElementById('password-modal').hidden) {
+    closePasswordModal();
+    return;
+  }
+  if (e.key === 'Escape' && !document.getElementById('observation-modal').hidden) {
+    closeObservationModal();
+    return;
+  }
+  if ((e.metaKey||e.ctrlKey) && e.key==='s') { e.preventDefault(); saveData(); }
+});
+document.getElementById('password-form').addEventListener('submit', changePassword);
+
+// ── DEFAULT DATA ───────────────────────────────────────
+function getDefaultData() {
+  return {
+    planificacionVersion: 5,
+    saldosIniciales: {},
+    ingresos: [],
+    gastos: [],
+    sinSuscripcion: [],
+    anuales: []
+  };
+}
+</script>
+</body>
+</html>
