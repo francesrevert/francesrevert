@@ -93,7 +93,8 @@ header {
   letter-spacing: .06em;
   color: var(--text);
 }
-.h-logo span { color: var(--text-muted); font-size: 16px; }
+.h-logo .brand-mobile { display: none; }
+.h-logo .brand-section { color: var(--text-muted); font-size: 16px; }
 
 .h-sep { width: 1px; height: 16px; background: var(--border2); }
 .h-date { font-size: 12px; color: var(--text-muted); font-style: italic; }
@@ -135,6 +136,25 @@ header {
   transition: color .15s;
 }
 .hbtn-ghost:hover { color: var(--text); }
+
+.quick-entry-bar {
+  width: min(var(--max), calc(100% - 2 * var(--gutter)));
+  margin: 24px auto 0;
+  display: flex;
+  justify-content: flex-end;
+}
+.quick-entry-btn {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--text);
+  background: var(--text);
+  color: var(--bg);
+  font: 700 12px var(--body);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.quick-entry-btn:hover { border-color: var(--blue); background: var(--blue); color: #fff; }
 
 /* ── KPI BAR ───────────────────────────────────────── */
 .kpi-bar {
@@ -571,6 +591,7 @@ tr.pending-renewal .renewal-toggle { opacity: 1; }
   cursor: pointer;
 }
 .modal-btn.primary { border-color: var(--text); background: var(--text); color: var(--bg); }
+.modal-btn:disabled { opacity: .55; cursor: wait; }
 
 .td-del { width: 36px; text-align: center; padding: 0 8px !important; }
 .del-btn {
@@ -646,7 +667,7 @@ header {
   line-height: 1;
   letter-spacing: .09em;
 }
-.h-logo span {
+.h-logo .brand-section {
   padding-left: 16px;
   border-left: 1px solid var(--border);
   color: var(--text-muted);
@@ -849,11 +870,16 @@ td.td-del { padding-block: 11px !important; }
 @media (max-width: 720px) {
   header { height: 68px; padding-inline: var(--gutter); }
   .h-logo { font-size: 20px; gap: 10px; }
-  .h-logo span { padding-left: 10px; font-size: 9px; }
+  .h-logo .brand-full,
+  .h-logo .brand-section { display: none; }
+  .h-logo .brand-mobile { display: inline; }
   .h-date { display: none; }
   .hbtn { width: 40px; padding: 0; justify-content: center; font-size: 0; }
   .hbtn svg { width: 15px; height: 15px; }
   .kpi-bar { margin-top: 24px; }
+  .quick-entry-bar { margin-top: 16px; }
+  .quick-entry-btn { width: 100%; }
+  .quick-entry-bar + .kpi-bar { margin-top: 12px; }
   .kpi-bar { grid-template-columns: repeat(2, 1fr); }
   .kpi-item { padding: 16px; }
   .kpi-item:nth-child(2) { border-right: none; }
@@ -1029,7 +1055,7 @@ td.td-del { padding-block: 11px !important; }
 <div id="app">
   <header>
     <div class="h-left">
-      <div class="h-logo">Manolo y María <span>Finanzas</span></div>
+      <div class="h-logo"><span class="brand-full">Manolo y María</span><span class="brand-mobile">MM</span><span class="brand-section">Finanzas</span></div>
       <div class="h-sep"></div>
       <div class="h-date" id="h-date"></div>
     </div>
@@ -1054,6 +1080,10 @@ td.td-del { padding-block: 11px !important; }
       </button>
     </div>
   </header>
+
+  <div class="quick-entry-bar">
+    <button class="quick-entry-btn" type="button" onclick="openMovementModal()">＋ Añadir movimiento</button>
+  </div>
 
   <div class="kpi-bar">
     <div class="kpi-item"><div class="kpi-label">Ingresos del mes</div><div class="kpi-val income" id="kpi-ingresos">—</div></div>
@@ -1213,6 +1243,54 @@ td.td-del { padding-block: 11px !important; }
   </div>
 </div>
 
+<div class="modal-backdrop" id="movement-modal" hidden onclick="handleMovementBackdrop(event)">
+  <form class="modal-card" id="movement-form" role="dialog" aria-modal="true" aria-labelledby="movement-modal-title" novalidate>
+    <div class="modal-head">
+      <div class="modal-title" id="movement-modal-title">Añadir movimiento</div>
+      <button class="modal-close" type="button" onclick="closeMovementModal()" aria-label="Cerrar">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-form-grid">
+        <div class="modal-field">
+          <label class="modal-label" for="movement-kind">Tipo</label>
+          <select class="modal-select" id="movement-kind" onchange="updateMovementForm()">
+            <option value="expense">Gasto</option>
+            <option value="income">Ingreso</option>
+          </select>
+        </div>
+        <div class="modal-field">
+          <label class="modal-label" for="movement-amount">Importe</label>
+          <input class="modal-input" id="movement-amount" type="text" inputmode="decimal" placeholder="0,00 €">
+        </div>
+        <div class="modal-field full">
+          <label class="modal-label" for="movement-name">Concepto</label>
+          <input class="modal-input" id="movement-name" type="text" maxlength="160">
+        </div>
+        <div class="modal-field">
+          <label class="modal-label" for="movement-date">Fecha</label>
+          <input class="modal-input" id="movement-date" type="date">
+        </div>
+        <div class="modal-field">
+          <label class="modal-label" for="movement-recurrence">Frecuencia</label>
+          <select class="modal-select" id="movement-recurrence"></select>
+        </div>
+        <div class="modal-field full">
+          <label class="modal-label" for="movement-status">Estado</label>
+          <select class="modal-select" id="movement-status">
+            <option value="paid">Realizado</option>
+            <option value="planned">Pendiente</option>
+          </select>
+        </div>
+      </div>
+      <div class="access-error" id="movement-error" role="alert"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn" type="button" onclick="closeMovementModal()">Cancelar</button>
+      <button class="modal-btn primary" id="movement-submit" type="submit">Añadir y guardar</button>
+    </div>
+  </form>
+</div>
+
 <div class="modal-backdrop" id="password-modal" role="dialog" aria-modal="true" aria-labelledby="password-modal-title" hidden onclick="handlePasswordBackdrop(event)">
   <form class="modal-card" id="password-form">
     <div class="modal-head">
@@ -1331,6 +1409,7 @@ let selectedMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1)
 if (selectedMonth < MIN_SELECTED_MONTH) selectedMonth = new Date(MIN_SELECTED_MONTH);
 let observationEditor = null;
 let scheduledPaymentEditorId = null;
+let movementFormBusy = false;
 
 // ── THEME ──────────────────────────────────────────────
 const THEME_PREFERENCE_KEY = 'manolo-maria-theme';
@@ -2896,6 +2975,95 @@ function addRow(s) {
   if (last) { const ed = last.querySelector('.td-el .editable'); if (ed) { ed.focus(); document.execCommand('selectAll',false,null); } }
 }
 
+function localIsoDate(date = new Date()) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
+function updateMovementForm() {
+  const kind = document.getElementById('movement-kind').value;
+  const recurrence = document.getElementById('movement-recurrence');
+  const previous = recurrence.value;
+  const options = kind === 'income'
+    ? [['once', 'Una vez'], ['monthly', 'Mensual']]
+    : [['once', 'Una vez'], ['monthly', 'Mensual'], ['annual', 'Anual']];
+  recurrence.replaceChildren(...options.map(([value, label]) => {
+    const option = document.createElement('option');
+    option.value = value;
+    option.textContent = label;
+    return option;
+  }));
+  if (options.some(([value]) => value === previous)) recurrence.value = previous;
+}
+function openMovementModal() {
+  const form = document.getElementById('movement-form');
+  form.reset();
+  document.getElementById('movement-kind').value = 'expense';
+  updateMovementForm();
+  document.getElementById('movement-date').value = localIsoDate();
+  document.getElementById('movement-status').value = 'paid';
+  document.getElementById('movement-error').textContent = '';
+  document.getElementById('movement-modal').hidden = false;
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => document.getElementById('movement-name').focus(), 0);
+}
+function closeMovementModal() {
+  if (movementFormBusy) return;
+  document.getElementById('movement-modal').hidden = true;
+  document.body.style.overflow = '';
+}
+function handleMovementBackdrop(event) {
+  if (event.target.id === 'movement-modal') closeMovementModal();
+}
+async function addMovement(event) {
+  event.preventDefault();
+  if (movementFormBusy) return;
+  const errorTarget = document.getElementById('movement-error');
+  const submit = document.getElementById('movement-submit');
+  const name = document.getElementById('movement-name').value.trim();
+  const amount = parseLocalizedAmount(document.getElementById('movement-amount').value);
+  const date = document.getElementById('movement-date').value;
+  errorTarget.textContent = '';
+  if (!name || amount == null || amount <= 0 || !parseIsoDate(date)) {
+    errorTarget.textContent = 'Completa concepto, importe y fecha.';
+    return;
+  }
+
+  const sourceId = `manual-${Date.now()}-${Array.from(crypto.getRandomValues(new Uint8Array(4)), byte => byte.toString(16).padStart(2, '0')).join('')}`;
+  const command = validateChatCommand({
+    version: 1,
+    operation: 'add_movement',
+    movement: {
+      kind: document.getElementById('movement-kind').value,
+      name,
+      amount,
+      date,
+      recurrence: document.getElementById('movement-recurrence').value,
+      status: document.getElementById('movement-status').value,
+      notes: '',
+      category: ''
+    }
+  }, sourceId);
+  const previousData = JSON.parse(JSON.stringify(data));
+  movementFormBusy = true;
+  submit.disabled = true;
+  submit.textContent = 'Guardando…';
+  try {
+    applyChatMovement(data, command);
+    renderAll();
+    await persistEncryptedData();
+    movementFormBusy = false;
+    closeMovementModal();
+    showToast('Movimiento guardado');
+  } catch (error) {
+    data = previousData;
+    renderAll();
+    errorTarget.textContent = error.message || 'No se ha podido guardar.';
+  } finally {
+    movementFormBusy = false;
+    submit.disabled = false;
+    submit.textContent = 'Añadir y guardar';
+  }
+}
+
 async function saveData() {
   const btn = document.getElementById('save-btn');
   btn.disabled = true;
@@ -2996,6 +3164,10 @@ function showToast(msg) {
 }
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
+    if (!document.getElementById('movement-modal').hidden) {
+      closeMovementModal();
+      return;
+    }
     if (!document.getElementById('password-modal').hidden) {
       closePasswordModal();
       return;
@@ -3011,6 +3183,7 @@ document.addEventListener('keydown', e => {
   }
   if ((e.metaKey||e.ctrlKey) && e.key==='s') { e.preventDefault(); saveData(); }
 });
+document.getElementById('movement-form').addEventListener('submit', addMovement);
 document.getElementById('password-form').addEventListener('submit', changePassword);
 
 // ── DEFAULT DATA ───────────────────────────────────────
