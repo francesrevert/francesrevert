@@ -1,7 +1,7 @@
 {
-  "name": "personal",
+  "name": "manolo-maria-finanzas",
   "interface": {
-    "displayName": "Personal"
+    "displayName": "Finanzas · Manolo y María"
   },
   "plugins": [
     {
